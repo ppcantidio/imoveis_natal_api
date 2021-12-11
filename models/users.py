@@ -24,20 +24,12 @@ class User_Models:
             })
             
         nome = nome.strip()
-        email = email.strip()
         telefone = telefone.strip()
 
         if nome == '':
             return jsonify({
                 'status': 'erro',
                 'mensagem': 'o campo nome esta vazio',
-                'codigo-requisicao': 'in06'
-            })
-
-        if email == '':
-            return jsonify({
-                'status': 'erro',
-                'mensagem': 'o campo email esta vazio',
                 'codigo-requisicao': 'in06'
             })
 
