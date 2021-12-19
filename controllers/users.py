@@ -25,9 +25,25 @@ class User(MethodView):
 
         return user
         
+    @users_routes.route('/editar', methods=['POST'])
+    def editar_usuario():
+        headers = request.headers
 
-    def edit_user():
-        pass
+        id = headers['token']
 
-    def delete_users():
+        nome  = request.form.get('nome')
+        #senha = request.form('senha')
+        email = request.form.get('email')
+        telefone = request.form.get('telefone')
+
+        user = model.editar_usuario(
+            nome=nome,
+            email=email,
+            telefone=telefone
+        )
+
+        return user
+        
+
+    def deletar_usuario():
         pass
