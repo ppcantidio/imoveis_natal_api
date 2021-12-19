@@ -1,16 +1,16 @@
 import re
 import json
-
 from flask.json import jsonify
 from controllers.database.database import Database
-
+from acessos_token import Token
 
 
 class User_Models:
 
-
     def __init__(self):
         self.db = Database()
+
+        self.token = Token()
 
 
     def  criar_usuario(self, nome, email, telefone):
@@ -66,8 +66,15 @@ class User_Models:
         usuario = self.db.insert_object(usuario, 'usuarios')
 
         usuario = self.db.select_one_object('usuarios', {'email': email})
+        id = str(usuario.get('_id'))
+
+        token = self.token.encrypt_token(id)
+
         usuario['_id'] = str(usuario['_id'])
-
-        print(usuario)
-
-        return usuario
+        return jsonify({
+            'status': 'sucesso',
+            'menssagem': 'usuario criado com sucesso',
+            'codigo-requisicao': 'in200',
+            'token': token,
+            'usuario': usuario
+        })

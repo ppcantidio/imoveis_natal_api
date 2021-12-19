@@ -1,10 +1,13 @@
 from flask.views import MethodView
 from flask import request, jsonify, Blueprint
 from models.users import User_Models
+from acessos_token import Token
 
 users_routes = Blueprint('users_routes', __name__)
 
 model = User_Models()
+
+tk = Token()
 
 class User(MethodView):
 
@@ -26,8 +29,16 @@ class User(MethodView):
         return user
         
 
+    @users_routes.route('/editar', methods=['POST'])
     def edit_user():
-        pass
+        headers = request.headers
+
+        token = headers['token']
+
+        id_usuario = tk.decrypt_token(token)
+
+        return jsonify({'id': id_usuario})
+
 
     def delete_users():
         pass
