@@ -16,7 +16,7 @@ def home():
 def before_request():
     url = request.url
 
-    if '/api/usuarios' not in url:
+    if '/api/usuarios/criar' not in url:
         headers = request.headers
 
         if 'token' not in headers:
@@ -32,9 +32,7 @@ def before_request():
             token = headers['token']
             token = tk.decrypt_token(token)
 
-            print(token)
-
-            if token:
+            if token == True:
                 return jsonify({
                 "status":"erro",
                 "mensagem": "token não pertence a nenhum usuario cadastrado",
@@ -42,7 +40,7 @@ def before_request():
             }), 403
 
             acess = db.select_one_object('usuarios', {'_id': ObjectId(token)})
-            
+
             if acess is None:
                 return jsonify({
                 "status":"erro",

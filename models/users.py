@@ -1,9 +1,6 @@
 import re
 import json
-<<<<<<< HEAD
-=======
 from bson.objectid import ObjectId
->>>>>>> 3392a8cff0861494b7d2f303bdbcfd9af0e601bb
 from flask.json import jsonify
 from models.validacoes import Validacoes
 from controllers.database.database import Database
@@ -15,11 +12,9 @@ class User_Models:
     def __init__(self):
         self.db = Database()
 
-<<<<<<< HEAD
         self.token = Token()
-=======
+
         self.validacoes = Validacoes()
->>>>>>> 3392a8cff0861494b7d2f303bdbcfd9af0e601bb
 
 
     def  criar_usuario(self, nome, email, telefone):
@@ -79,8 +74,8 @@ class User_Models:
 
         token = self.token.encrypt_token(id)
 
-<<<<<<< HEAD
         usuario['_id'] = str(usuario['_id'])
+
         return jsonify({
             'status': 'sucesso',
             'menssagem': 'usuario criado com sucesso',
@@ -88,11 +83,12 @@ class User_Models:
             'token': token,
             'usuario': usuario
         })
-=======
+
         return usuario
 
 
     def editar_usuario(self, id, nome, email, telefone):
+        print(id)
         usuario = self.db.select_one_object('usuarios', {'_id': ObjectId(id)})
 
         nome = nome.strip()
@@ -144,11 +140,3 @@ class User_Models:
             'codigorequisicao': 'in200',
             'usuario': usuario
         })
-
-        
-
-        
-
-        
-        
->>>>>>> 3392a8cff0861494b7d2f303bdbcfd9af0e601bb

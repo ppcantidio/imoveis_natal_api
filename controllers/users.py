@@ -28,11 +28,7 @@ class User(MethodView):
 
         return user
         
-    @users_routes.route('/editar', methods=['POST'])
-    def editar_usuario():
-        headers = request.headers
 
-<<<<<<< HEAD
     @users_routes.route('/editar', methods=['POST'])
     def edit_user():
         headers = request.headers
@@ -41,18 +37,13 @@ class User(MethodView):
 
         id_usuario = tk.decrypt_token(token)
 
-        return jsonify({'id': id_usuario})
-
-=======
-        id = headers['token']
->>>>>>> 3392a8cff0861494b7d2f303bdbcfd9af0e601bb
-
         nome  = request.form.get('nome')
         #senha = request.form('senha')
         email = request.form.get('email')
         telefone = request.form.get('telefone')
 
         user = model.editar_usuario(
+            id=id_usuario,
             nome=nome,
             email=email,
             telefone=telefone
