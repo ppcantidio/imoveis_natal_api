@@ -22,7 +22,11 @@ class User_Models:
             return  False
 
 
-    def verifica_permissao(self, token, permissao):
+    def verifica_permissao(self, token, permissao, email=None):
+        verifica_usuario_adm = self.db.select_one_object('usuarios', {'email': email})
+        if verifica_usuario_adm['tipo'] == 'administrador':
+            raise PermissaoInvalida()
+
         id = self.token.decrypt_token(token)
 
         usuario =  self.db.select_one_object('usuarios', {'_id': ObjectId(id)})
@@ -134,7 +138,7 @@ class User_Models:
 
     def editar_permissoes(self, token, email_usuario, criar_usuarios,  excluir_usuarios, aprovar_imoveis, excluir_imoveis, editar_imoveis, ocultar_imoveis):
         # verificacao de permissoes
-        self.verifica_permissao(token, 'editar_permissoes')
+        self.verifica_permissao(token, 'editar_permissoes', email_usuario)
         
         # fazendo alteracoes de permissoes no usuario
         usuario = self.db.select_one_object('usuarios', {'email': email_usuario})
@@ -162,7 +166,7 @@ class User_Models:
 
 
     def deletar_usuario(self, email_usuario, token):
-        self.verifica_permissao(token, 'excluir_usuarios')
+        self.verifica_permissao(token, 'excluir_usuarios', email_usuario)
 
         id  = self.token.decrypt_token(token)
 
