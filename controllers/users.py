@@ -30,15 +30,15 @@ class User(MethodView):
         headers = request.headers
         
         user = model.editar_usuario(
+            
             token=headers['token'],
             nome =request.form.get('nome'),
             #senha = request.form('senha'),
             email=request.form.get('email'),
-            telefone=request.form.get('telefone'),
+            telefone=request.form.get('telefone')
         )
 
         return user
-        
 
     def deletar_usuario():
         pass

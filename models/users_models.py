@@ -170,12 +170,12 @@ class User_Models:
         id_usuario = self.token.decrypt_token(token)
 
         usuario = self.db.select_one_object('usuarios', {'_id': ObjectId(id_usuario)})
+        
         if  usuario['permissoes']['permissoes_administrador'] == False:
             return jsonify({
                 'status': 'erro',
                 "menssagem": 'permissoes insuficiente para realizacao operacao',
                 'codigorequisicao': 'in300',
-                'usuario': usuario
             })
         
         # fazendo alteracoes de permissoes no usuario
@@ -190,8 +190,10 @@ class User_Models:
         perimissoes_usuario['ocultar_imoveis'] = self.retorna_booleano(ocultar_imoveis)
 
         usuario['permissoes'] =  perimissoes_usuario
-
         usuario = self.db.update_object(usuario, 'usuarios', {'email': email_usuario})
+        usuario = self.db.select_one_object('usuarios', {'email': email_usuario})
+
+        usuario['_id'] = str(usuario['_id'])
 
         return jsonify({
             'status': 'sucesso',
