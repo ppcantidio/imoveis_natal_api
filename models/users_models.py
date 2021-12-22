@@ -263,3 +263,38 @@ class User_Models:
             'codigorequisicao': 'in200',
             'usuario': usuarios
         })
+
+
+    def inativar_usuario(self, token,  email_usuario):
+        id_usuario = self.token.decrypt_token(token)
+
+        usuario_adm = self.db.select_one_object('usuarios', {'_id': ObjectId(id_usuario)})
+
+        if usuario_adm['tipo'] !=  'administrador':
+            return  jsonify({
+                'status': 'erro',
+                "menssagem": 'permissoes insuficientes para realizacao operacao',
+                'codigorequisicao': 'in300',
+            })
+
+        usuario = self.db.select_one_object('usuarios', {'email': email_usuario})
+
+        if usuario is None:
+            return  jsonify({
+                'status': 'erro',
+                "menssagem": 'usuario nao encontrado',
+                'codigorequisicao': 'in404',
+            })
+
+        usuario['status'] = 'inativado'
+
+        self.db.update_object(usuario, 'usuarios', {'email': email_usuario})
+        usuario = self.db.select_one_object(usuario,  {'email': email_usuario})
+        del usuario['_id']
+
+        return jsonify({
+            'status': 'sucesso',
+            'menssagem': 'usuario inativado com sucesso',
+            'usuario': usuario
+        })
+        

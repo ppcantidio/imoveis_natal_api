@@ -55,8 +55,14 @@ class User(MethodView):
 
     @users_routes.route('/inativar', methods=['POST'])
     def inativar_usuario():
-        pass
+        headers = request.headers
 
+        usuario = model.inativar_usuario(
+            token=headers['token'],
+            email_usuario=request.form.get('email_usuario')
+        )
+
+        return usuario
 
     @users_routes.route('/permissoes', methods=['POST'])
     def editar_permissoes():
