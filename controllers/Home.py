@@ -1,6 +1,7 @@
 from controllers.database.database import Database
 from flask import request, jsonify, Blueprint
 from app import webapi
+from controllers.exceptions import UsuarioNaoEncontrado,  PermissaoInvalida
 from acessos_token import Token
 from bson.objectid import ObjectId
 
@@ -63,4 +64,20 @@ def page_not_found(e):
             "codigo_requisicao": "in03"
         }), 404
 
-        
+
+@webapi.errorhandler(UsuarioNaoEncontrado)
+def usuario_nao_encontrado(UsuarioNaoEncontradoObject):
+    return jsonify({
+                'status': 'erro',
+                'menssagem': 'usuario nao  encontrado',
+                'codigo-requisicao':  'in404'
+            })
+
+
+@webapi.errorhandler(PermissaoInvalida)
+def permissao_invalida(PermissaoInvalidaObject):
+    return jsonify({
+                'status': 'erro',
+                'menssagem': 'permissao invalida',
+                'codigo-requisicao':  'in404'
+            })

@@ -3,7 +3,7 @@ from flask.json import jsonify
 from bson.objectid import ObjectId
 from models.validacoes import Validacoes
 from controllers.database.database import Database
-
+from controllers.exceptions  import UsuarioNaoEncontrado, PermissaoInvalida
 
 class User_Models:
 
@@ -23,18 +23,16 @@ class User_Models:
             return  False
 
 
-    def  criar_usuario(self, token, nome, email, telefone):
-        # verificacao de permissoes
+    def verifica_permissao(self, token, permissao):
         id = self.token.decrypt_token(token)
 
-        usuario_admin = self.db.select_one_object('usuarios', {'_id': ObjectId(id)})
+        usuario =  self.db.select_one_object('usuarios', {'_id': ObjectId(id)})
 
-        if usuario_admin['permissoes']['criar_usuarios'] == False:
-            return jsonify({
-                'status': 'erro',
-                'mensagem': 'permissao insuficiente para realizar operacao',
-                'codigo-requisicao': 'in00'
-            })
+        if usuario['permissoes'][permissao]  ==  False:
+            raise PermissaoInvalida()
+
+    def  criar_usuario(self, token, nome, email, telefone):
+        self.verifica_permissao(token, 'criar_usuarios')
 
         # validacao de dados
         validacao_email = self.validacoes.validar_email(email)
@@ -94,7 +92,7 @@ class User_Models:
                 'excluir_imoveis_geral': False,
                 'editar_imoveis_geral': False,
                 'ocultar_imovies_geral': False,
-                'permissoes_administrador': False
+                'editar_permissoes': False
             }
         }
 
@@ -156,38 +154,9 @@ class User_Models:
         }) 
 
 
-    def excluir_usuario(self, id):
-        usuario = self.db.select_one_object('processos', {'_id': ObjectId(id)})
-
-        if usuario is None:
-            return jsonify({
-                'status': 'erro',
-                'menssagem': 'nao existe nenhum usuario com esse id',
-                "codigo_requisicao": 'in12'
-            })
-
-        self.db.delete_one('processos', {'_id': ObjectId(id)})
-
-        return jsonify({
-            'status': 'sucesso',
-            "menssagem": 'usuario deletado com sucesso',
-            'codigorequisicao': 'in200',
-            'usuario': usuario
-        })
-
-
     def editar_permissoes(self, token, email_usuario, criar_usuarios,  excluir_usuarios, aprovar_imoveis, excluir_imoveis, editar_imoveis, ocultar_imoveis):
         # verificacao de permissoes
-        id_usuario = self.token.decrypt_token(token)
-
-        usuario = self.db.select_one_object('usuarios', {'_id': ObjectId(id_usuario)})
-        
-        if  usuario['permissoes']['permissoes_administrador'] == False:
-            return jsonify({
-                'status': 'erro',
-                "menssagem": 'permissoes insuficientes para realizacao operacao',
-                'codigorequisicao': 'in300',
-            })
+        self.verifica_permissao(token, 'editar_permissoes')
         
         # fazendo alteracoes de permissoes no usuario
         usuario = self.db.select_one_object('usuarios', {'email': email_usuario})
@@ -215,44 +184,21 @@ class User_Models:
 
 
     def deletar_usuario(self, email_usuario, token):
-        id_adm = self.token.decrypt_token(token)
+        self.verifica_permissao(token, 'excluir_usuarios')
 
-        adm =  self.db.select_one_object('usuarios', {'_id': ObjectId(id_adm)})
+        self.db.delete_one('usuarios', {'email', email_usuario})
 
-        if  adm['permissoes']['excluir_usuarios'] == True:
-            self.db.delete_one('usuarios', {'email', email_usuario})
+        usuario = self.db.select_one_object('usuarios',  {'email': email_usuario})
 
-            usuario = self.db.select_one_object('usuarios',  {'email': email_usuario})
-
-            if usuario is None:
-                return jsonify({
-                'status': 'sucesso',
-                "menssagem": 'usuario deletado sucesso',
-                'codigorequisicao': 'in200',
-            })
-        else:
-            return jsonify({
-                'status': 'erro',
-                "menssagem": 'permissoes insuficientes para realizacao operacao',
-                'codigorequisicao': 'in300',
-            })
-
+        if usuario is None:
+            raise UsuarioNaoEncontrado()
+       
         
-    def exbir_usuarios(self, token):
-        id_usuario = self.token.decrypt_token(token)
-
-        usuario_adm = self.db.select_one_object('usuarios', {'_id': ObjectId(id_usuario)})
-        
-        if usuario_adm['tipo'] !=  'administrador':
-            return  jsonify({
-                'status': 'erro',
-                "menssagem": 'permissoes insuficientes para realizacao operacao',
-                'codigorequisicao': 'in300',
-            })
+    def exbir_usuarios(self):
+        lista_usuarios = []
 
         usuarios =  self.db.select_all_objects('usuarios')
 
-        lista_usuarios = []
         for usuario in usuarios:
             del usuario['_id']
             lista_usuarios.append(usuario)
@@ -280,12 +226,8 @@ class User_Models:
         usuario = self.db.select_one_object('usuarios', {'email': email_usuario})
 
         if usuario is None:
-            return  jsonify({
-                'status': 'erro',
-                "menssagem": 'usuario nao encontrado',
-                'codigorequisicao': 'in404',
-            })
-
+            raise UsuarioNaoEncontrado()
+            
         usuario['status'] = 'inativado'
 
         self.db.update_object(usuario, 'usuarios', {'email': email_usuario})
@@ -297,4 +239,3 @@ class User_Models:
             'menssagem': 'usuario inativado com sucesso',
             'usuario': usuario
         })
-        

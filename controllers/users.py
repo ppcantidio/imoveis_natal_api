@@ -82,12 +82,7 @@ class User(MethodView):
         return user
 
 
-    @users_routes.route('/usuarios', methods=['GET'])
+    @users_routes.route('/todos', methods=['GET'])
     def  exibir_usuarios():
-        headers = request.headers
 
-        usuarios = model.exbir_usuarios(
-            token=headers['token']
-        )
-
-        return usuarios
+        return model.exbir_usuarios()
