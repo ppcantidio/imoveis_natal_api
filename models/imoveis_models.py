@@ -13,5 +13,5 @@ class Imoveis_Models():
         self.validacoes = Validacoes()
 
     
-    def criar_imovel(id_usuario, titulo, imovel, ):
+    def criar_imovel(self, id_usuario, titulo, tamanho, preco, quartos, banheiros, area_lazer, vagas_garagem, elevador):
         pass

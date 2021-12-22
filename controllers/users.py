@@ -1,52 +1,40 @@
 from flask.views import MethodView
 from flask import request, jsonify, Blueprint
-from models.users import User_Models
+from models.users_models import User_Models
 from acessos_token import Token
 
 users_routes = Blueprint('users_routes', __name__)
 
 model = User_Models()
 
-tk = Token()
-
 class User(MethodView):
 
 
     @users_routes.route('/criar', methods=['POST'])
     def criar_usuarios():
-        nome  = request.form.get('nome')
-        #senha = request.form('senha')
-        email = request.form.get('email')
-        telefone = request.form.get('telefone')
+        headers = request.headers
 
         user = model.criar_usuario(
-            nome=nome,
-            #senha=senha,
-            email=email,
-            telefone=telefone,
+            token=headers['token'],
+            nome=request.form.get('nome'),
+            #senha = request.form('senha'),
+            email=request.form.get('email'),
+            telefone=request.form.get('telefone')
         )
 
         return user
         
 
     @users_routes.route('/editar', methods=['POST'])
-    def edit_user():
+    def editar_usuario():
         headers = request.headers
-
-        token = headers['token']
-
-        id_usuario = tk.decrypt_token(token)
-
-        nome  = request.form.get('nome')
-        #senha = request.form('senha')
-        email = request.form.get('email')
-        telefone = request.form.get('telefone')
-
+        
         user = model.editar_usuario(
-            id=id_usuario,
-            nome=nome,
-            email=email,
-            telefone=telefone
+            token=headers['token'],
+            nome =request.form.get('nome'),
+            #senha = request.form('senha'),
+            email=request.form.get('email'),
+            telefone=request.form.get('telefone'),
         )
 
         return user
@@ -54,3 +42,21 @@ class User(MethodView):
 
     def deletar_usuario():
         pass
+
+
+    @users_routes.route('/permissoes', methods=['POST'])
+    def editar_permissoes():
+        headers = request.headers
+
+        user = model.editar_permissoes(
+            token=headers['token'],
+            email_usuario=request.form.get('email'),
+            criar_usuarios=request.form.get('criar_usuarios'),
+            excluir_usuarios=request.form.get('excluir_usuarios'),
+            aprovar_imoveis=request.form.get('aprovar_imoveis'),
+            excluir_imoveis=request.form.get('excluir_imoveis'),
+            editar_imoveis=request.form.get('editar_imoveis'),
+            ocultar_imoveis=request.form.get('ocultar_imoveis')
+        )
+
+        return user
