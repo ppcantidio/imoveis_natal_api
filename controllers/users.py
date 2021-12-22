@@ -40,7 +40,21 @@ class User(MethodView):
 
         return user
 
+
+    @users_routes.route('/deletar', methods=['POST'])
     def deletar_usuario():
+        headers = request.headers
+
+        resultado = model.deletar_usuario(
+            token=headers['token'],
+            email_usuario=request.form.get('email_usuario')
+        )
+
+        return resultado
+
+
+    @users_routes.route('/inativar', methods=['POST'])
+    def inativar_usuario():
         pass
 
 
@@ -60,3 +74,10 @@ class User(MethodView):
         )
 
         return user
+
+
+    @users_routes.route('/usuarios', methods=['GET'])
+    def  exibir_usuarios():
+        usuarios = model.exbir_usuarios()
+
+        return usuarios

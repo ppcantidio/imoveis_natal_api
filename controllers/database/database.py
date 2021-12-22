@@ -85,3 +85,8 @@ class Database:
         collection = self.db.get_collection(collection)
 
         return collection.update(where, {'$inc': {field: 1}})
+
+    def select_all_objects(self, collection):
+        collection = self.db.get_collection(collection)
+
+        return list(collection.find({}))

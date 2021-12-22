@@ -14,12 +14,14 @@ class User_Models:
 
         self.validacoes = Validacoes()
 
+
     @staticmethod
     def retorna_booleano(string):
         if string == 'True':
             return True
         else:
             return  False
+
 
     def  criar_usuario(self, token, nome, email, telefone):
         # verificacao de permissoes
@@ -174,7 +176,7 @@ class User_Models:
         if  usuario['permissoes']['permissoes_administrador'] == False:
             return jsonify({
                 'status': 'erro',
-                "menssagem": 'permissoes insuficiente para realizacao operacao',
+                "menssagem": 'permissoes insuficientes para realizacao operacao',
                 'codigorequisicao': 'in300',
             })
         
@@ -200,4 +202,44 @@ class User_Models:
             "menssagem": 'permissoes do usuario alteradas com sucesso',
             'codigorequisicao': 'in200',
             'usuario': usuario
+        })
+
+
+    def deletar_usuario(self, email_usuario, token):
+        id_adm = self.token.decrypt_token(token)
+
+        adm =  self.db.select_one_object('usuarios', {'_id': ObjectId(id_adm)})
+
+        if  adm['permissoes']['excluir_usuarios'] == True:
+            self.db.delete_one('usuarios', {'email', email_usuario})
+
+            usuario = self.db.select_one_object('usuarios',  {'email': email_usuario})
+
+            if usuario is None:
+                return jsonify({
+                'status': 'sucesso',
+                "menssagem": 'usuario deletado sucesso',
+                'codigorequisicao': 'in200',
+            })
+        else:
+            return jsonify({
+                'status': 'erro',
+                "menssagem": 'permissoes insuficientes para realizacao operacao',
+                'codigorequisicao': 'in300',
+            })
+
+        
+    def exbir_usuarios(self):
+        usuarios =  self.db.select_all_objects('usuarios')
+
+        lista_usuarios = []
+        for usuario in usuarios:
+            usuario['_id'] = str(usuario['_id'])
+            lista_usuarios.append(usuario)
+
+        return jsonify({
+            'status': 'sucesso',
+            "menssagem": 'usuarios encontrados com sucesso',
+            'codigorequisicao': 'in200',
+            'usuario': usuarios
         })
