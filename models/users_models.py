@@ -101,7 +101,7 @@ class User_Models:
         usuario = self.db.insert_object(usuario, 'usuarios')
 
         usuario = self.db.select_one_object('usuarios', {'email': email})
-        usuario['_id'] = str(usuario['_id'])
+        del usuario['_id']
 
         return jsonify({
             'status': 'sucesso',
@@ -145,6 +145,15 @@ class User_Models:
             usuario['email'] = email
 
         self.db.update_object(usuario, 'processos', {'_id': ObjectId(id)})
+        usuario = self.db.select_one_object('usuarios', {'_id': ObjectId(id)})
+        del usuario['_id']
+
+        return jsonify({
+            'status': 'sucesso',
+            "menssagem": 'usuario editado com sucesso',
+            'codigorequisicao': 'in200',
+            'usuario': usuario
+        }) 
 
 
     def excluir_usuario(self, id):
@@ -195,7 +204,7 @@ class User_Models:
         usuario = self.db.update_object(usuario, 'usuarios', {'email': email_usuario})
         usuario = self.db.select_one_object('usuarios', {'email': email_usuario})
 
-        usuario['_id'] = str(usuario['_id'])
+        del usuario['_id']
 
         return jsonify({
             'status': 'sucesso',
@@ -229,12 +238,23 @@ class User_Models:
             })
 
         
-    def exbir_usuarios(self):
+    def exbir_usuarios(self, token):
+        id_usuario = self.token.decrypt_token(token)
+
+        usuario_adm = self.db.select_one_object('usuarios', {'_id': ObjectId(id_usuario)})
+        
+        if usuario_adm['tipo'] !=  'administrador':
+            return  jsonify({
+                'status': 'erro',
+                "menssagem": 'permissoes insuficientes para realizacao operacao',
+                'codigorequisicao': 'in300',
+            })
+
         usuarios =  self.db.select_all_objects('usuarios')
 
         lista_usuarios = []
         for usuario in usuarios:
-            usuario['_id'] = str(usuario['_id'])
+            del usuario['_id']
             lista_usuarios.append(usuario)
 
         return jsonify({
