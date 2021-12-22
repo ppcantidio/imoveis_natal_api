@@ -3,3 +3,7 @@ class UsuarioNaoEncontrado(Exception):
 
 class PermissaoInvalida(Exception):
     pass
+
+class CampoIncorreto(Exception):
+    def __init__(self, campo):
+        self.campo = campo

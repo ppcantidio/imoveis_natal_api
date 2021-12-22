@@ -1,7 +1,7 @@
 from controllers.database.database import Database
 from flask import request, jsonify, Blueprint
 from app import webapi
-from controllers.exceptions import UsuarioNaoEncontrado,  PermissaoInvalida
+from controllers.exceptions import UsuarioNaoEncontrado,  PermissaoInvalida, CampoIncorreto
 from acessos_token import Token
 from bson.objectid import ObjectId
 
@@ -81,3 +81,12 @@ def permissao_invalida(PermissaoInvalidaObject):
                 'menssagem': 'permissao invalida',
                 'codigo-requisicao':  'in404'
             })
+
+
+@webapi.errorhandler(CampoIncorreto)
+def campo_incorreto(CampoIncorretoObject):
+    return jsonify({
+                'status': 'erro',
+                'menssagem': f'preencha o campo {CampoIncorretoObject.campo} corretamente',
+                'codigo-requisicao': 'in10'
+    })

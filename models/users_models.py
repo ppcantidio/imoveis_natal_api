@@ -4,7 +4,6 @@ from bson.objectid import ObjectId
 from models.validacoes import Validacoes
 from controllers.database.database import Database
 from controllers.exceptions  import UsuarioNaoEncontrado, PermissaoInvalida
-
 class User_Models:
 
     def __init__(self):
@@ -35,30 +34,9 @@ class User_Models:
         self.verifica_permissao(token, 'criar_usuarios')
 
         # validacao de dados
-        validacao_email = self.validacoes.validar_email(email)
-        validacao_nome = self.validacoes.validar_nome(nome)
-        validacao_telefone = self.validacoes.validar_telefone(telefone)
-
-        if validacao_email is False:
-            return jsonify({
-                'status': 'erro',
-                'mensagem': 'preencha o campo email corretamente',
-                'codigo-requisicao': 'in10'
-            })
-
-        if validacao_telefone is False:
-            return jsonify({
-                'status': 'erro',
-                'mensagem': 'preencha o campo telefone corretamente',
-                'codigo-requisicao': 'in10'
-            })
-
-        if validacao_nome is False:
-            return jsonify({
-                'status': 'erro',
-                'mensagem': 'preencha o campo nome corretamente',
-                'codigo-requisicao': 'in10'
-            })
+        self.validacoes.validar_email(email)
+        self.validacoes.validar_nome(nome)
+        self.validacoes.validar_telefone(telefone)
 
         # verificacao de existencia de dados
         email_existe = self.db.select_one_object('usuarios', {'email': email})
@@ -186,12 +164,27 @@ class User_Models:
     def deletar_usuario(self, email_usuario, token):
         self.verifica_permissao(token, 'excluir_usuarios')
 
-        self.db.delete_one('usuarios', {'email', email_usuario})
+        id  = self.token.decrypt_token(token)
 
         usuario = self.db.select_one_object('usuarios',  {'email': email_usuario})
 
+        if usuario['_id'] == ObjectId(id):
+            return jsonify({
+                'status': 'erro',
+                'menssagem': 'voce nao pode excluir seu proprio usuario',
+                'codigorequisicao': 'in300'
+            })
+
         if usuario is None:
             raise UsuarioNaoEncontrado()
+
+        self.db.delete_one('usuarios', {'email', email_usuario})
+
+        return jsonify({
+            'status': 'sucesso',
+            "menssagem": 'usuario deletado com sucesso',
+            'codigorequisicao': 'in200',
+        })
        
         
     def exbir_usuarios(self):
@@ -223,11 +216,19 @@ class User_Models:
                 'codigorequisicao': 'in300',
             })
 
+
         usuario = self.db.select_one_object('usuarios', {'email': email_usuario})
+
+        if usuario['_id'] == ObjectId(id_usuario):
+            return jsonify({
+                'status': 'erro',
+                'menssagem': 'voce nao pode inativar seu proprio usuario',
+                'codigorequisicao': 'in300'
+            })
 
         if usuario is None:
             raise UsuarioNaoEncontrado()
-            
+
         usuario['status'] = 'inativado'
 
         self.db.update_object(usuario, 'usuarios', {'email': email_usuario})
