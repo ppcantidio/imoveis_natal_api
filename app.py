@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 load_dotenv('.env')
 
 webapi = Flask(__name__)
+webapi.secret_key = 'enhasupersecreta'
 
 #importando blueprints
 from controllers.users import users_routes

@@ -17,43 +17,44 @@ def home():
 def before_request():
     url = request.url
 
-    headers = request.headers
+    if '/usuarios' not in url:
+        headers = request.headers
 
-    if 'token' not in headers:
-        return jsonify({
-            'status': 'erro',
-            'menssagem': 'erro de segurança',
-            'codigo_requisicao': 'in01'
-        }), 403
-
-    else:
-        db = Database()
-
-        token = headers['token']
-        token = tk.decrypt_token(token)
-
-        if token == True:
+        if 'token' not in headers:
             return jsonify({
-            "status":"erro",
-            "mensagem": "token não pertence a nenhum usuario cadastrado",
-            "codigo_requisicao": "in02"
-        }), 403
+                'status': 'erro',
+                'menssagem': 'erro de segurança',
+                'codigo_requisicao': 'in01'
+            }), 403
 
-        acess = db.select_one_object('usuarios', {'_id': ObjectId(token)})
+        else:
+            db = Database()
 
-        if acess is None:
-            return jsonify({
-            "status":"erro",
-            "mensagem": "token não pertence a nenhum usuario cadastrado",
-            "codigo_requisicao": "in02"
-        }), 403
+            token = headers['token']
+            token = tk.decrypt_token(token)
 
-        if acess['status'] == 'inativo':
-            return jsonify({
-            "status":"erro",
-            "mensagem": "o seu usuario esta inativado",
-            "codigo_requisicao": "in02"
-        }), 403
+            if token == True:
+                return jsonify({
+                "status":"erro",
+                "mensagem": "token não pertence a nenhum usuario cadastrado",
+                "codigo_requisicao": "in02"
+            }), 403
+
+            acess = db.select_one_object('usuarios', {'_id': ObjectId(token)})
+
+            if acess is None:
+                return jsonify({
+                "status":"erro",
+                "mensagem": "token não pertence a nenhum usuario cadastrado",
+                "codigo_requisicao": "in02"
+            }), 403
+
+            if acess['status'] == 'inativo':
+                return jsonify({
+                "status":"erro",
+                "mensagem": "o seu usuario esta inativado",
+                "codigo_requisicao": "in02"
+            }), 403
 
 
 @webapi.errorhandler(404)

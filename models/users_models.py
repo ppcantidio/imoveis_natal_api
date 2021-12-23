@@ -1,9 +1,11 @@
 from flask.json import jsonify
+from flask import session
 from acessos_token import Token
 from bson.objectid import ObjectId
 from models.validacoes import Validacoes
 from controllers.database.database import Database
 from controllers.exceptions  import UsuarioNaoEncontrado, PermissaoInvalida
+from passlib.hash import pbkdf2_sha256
 
 
 class User_Models:
@@ -24,6 +26,13 @@ class User_Models:
             return  False
 
 
+    def iniciar_sessao(self, user):
+        del user['senha']
+        session['logged_in'] = True
+        session['usuario'] = user
+        
+
+
     def verifica_permissao(self, token, permissao, email=None):
         if email is not None:
             verifica_usuario_adm = self.db.select_one_object('usuarios', {'email': email})
@@ -38,8 +47,8 @@ class User_Models:
         if usuario['permissoes'][permissao]  ==  False:
             raise PermissaoInvalida()
 
-    def  criar_usuario(self, token, nome, email, telefone):
-        self.verifica_permissao(token, 'criar_usuarios')
+    def  criar_usuario(self, nome, email, telefone, senha):
+        #self.verifica_permissao(token, 'criar_usuarios')
 
         # validacao de dados
         self.validacoes.validar_email(email)
@@ -68,6 +77,7 @@ class User_Models:
         usuario = {
             'nome': nome,
             'email': email,
+            'senha': pbkdf2_sha256.encrypt(senha),
             'telefone': telefone,
             'tipo': 'corretor',
             'status': 'ativo',
@@ -85,6 +95,7 @@ class User_Models:
         usuario = self.db.insert_object(usuario, 'usuarios')
 
         usuario = self.db.select_one_object('usuarios', {'email': email})
+        self.iniciar_sessao(usuario)
         id = str(usuario.get('_id'))
         del usuario['_id']
 
@@ -173,10 +184,9 @@ class User_Models:
         })
 
 
-    def deletar_usuario(self, email_usuario, token):
-        self.verifica_permissao(token, 'excluir_usuarios', email_usuario)
-
-        id  = self.token.decrypt_token(token)
+    def deletar_usuario(self, email_usuario, usuario):
+        if usuario['permissoes']['excluir_usuarios'] == False:
+            raise PermissaoInvalida()
 
         usuario = self.db.select_one_object('usuarios',  {'email': email_usuario})
 
@@ -291,3 +301,33 @@ class User_Models:
             'menssagem': 'usuario ativado com sucesso',
             'usuario': usuario
         })
+
+    def signout(self):
+        session.clear()
+        return jsonify({'deslogado': 'sucesso'})
+
+
+    def login(self, email, senha):
+        usuario = self.db.select_one_object('usuarios', {'email': email})
+
+        if usuario is None:
+            raise UsuarioNaoEncontrado()
+
+        if pbkdf2_sha256.verify(usuario[senha], usuario['senha']):
+            self.iniciar_sessao()
+
+            del usuario['senha']
+
+            return jsonify({
+                'status': 'sucesso',
+                'menssagem': 'usuario logado com sucesso',
+                'codigo-requisicao': 'in200',
+                'usuario': usuario
+            })
+
+        return jsonify({
+            'status': 'erro',
+            'menssagem': 'senha incorreta',
+            'codigo-requisicao': 'in401'
+        })
+        
