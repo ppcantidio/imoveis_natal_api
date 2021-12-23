@@ -1,7 +1,6 @@
 from flask.views import MethodView
-from flask import request, jsonify, Blueprint
 from models.users_models import User_Models
-from acessos_token import Token
+from flask import request, jsonify, Blueprint
 
 users_routes = Blueprint('users_routes', __name__)
 
@@ -63,6 +62,19 @@ class User(MethodView):
         )
 
         return usuario
+
+    
+    @users_routes.route('/ativar', methods=['POST'])
+    def ativar_usuario():
+        headers = request.headers
+
+        usuario = model.ativar_usuario(
+            token=headers['token'],
+            email_usuario=request.form.get('email_usuario')
+        )
+
+        return usuario
+
 
     @users_routes.route('/permissoes', methods=['POST'])
     def editar_permissoes():
