@@ -23,9 +23,11 @@ class User_Models:
 
 
     def verifica_permissao(self, token, permissao, email=None):
-        verifica_usuario_adm = self.db.select_one_object('usuarios', {'email': email})
-        if verifica_usuario_adm['tipo'] == 'administrador':
-            raise PermissaoInvalida()
+        if email is not None:
+            verifica_usuario_adm = self.db.select_one_object('usuarios', {'email': email})
+            if verifica_usuario_adm is not None:
+                if verifica_usuario_adm['tipo'] == 'administrador':
+                    raise PermissaoInvalida()
 
         id = self.token.decrypt_token(token)
 
@@ -71,9 +73,9 @@ class User_Models:
                 'criar_usuarios': False,
                 'excluir_usuarios': False,
                 'aprovar_imoveis': False,
-                'excluir_imoveis_geral': False,
-                'editar_imoveis_geral': False,
-                'ocultar_imovies_geral': False,
+                'excluir_imoveis': False,
+                'editar_imoveis': False,
+                'ocultar_imovies': False,
                 'editar_permissoes': False
             }
         }
@@ -81,13 +83,14 @@ class User_Models:
         usuario = self.db.insert_object(usuario, 'usuarios')
 
         usuario = self.db.select_one_object('usuarios', {'email': email})
+        id = str(usuario.get('_id'))
         del usuario['_id']
 
         return jsonify({
             'status': 'sucesso',
             'menssagem': 'usuario criado com sucesso',
             'codigo-requisicao': 'in200',
-            'token': self.token.encrypt_token(str(usuario.get('_id'))),
+            'token': self.token.encrypt_token(id),
             'usuario': usuario
         })
 
@@ -124,7 +127,7 @@ class User_Models:
         if email != '':
             usuario['email'] = email
 
-        self.db.update_object(usuario, 'processos', {'_id': ObjectId(id)})
+        self.db.update_object(usuario, 'usuarios', {'_id': ObjectId(id)})
         usuario = self.db.select_one_object('usuarios', {'_id': ObjectId(id)})
         del usuario['_id']
 
@@ -142,6 +145,9 @@ class User_Models:
         
         # fazendo alteracoes de permissoes no usuario
         usuario = self.db.select_one_object('usuarios', {'email': email_usuario})
+        if usuario is None:
+            raise UsuarioNaoEncontrado()
+            
         perimissoes_usuario = usuario['permissoes']
 
         perimissoes_usuario['criar_usuarios'] = self.retorna_booleano(criar_usuarios)
@@ -172,6 +178,9 @@ class User_Models:
 
         usuario = self.db.select_one_object('usuarios',  {'email': email_usuario})
 
+        if usuario is None:
+            raise UsuarioNaoEncontrado()
+
         if usuario['_id'] == ObjectId(id):
             return jsonify({
                 'status': 'erro',
@@ -182,7 +191,7 @@ class User_Models:
         if usuario is None:
             raise UsuarioNaoEncontrado()
 
-        self.db.delete_one('usuarios', {'email', email_usuario})
+        self.db.delete_one('usuarios', {'email': email_usuario})
 
         return jsonify({
             'status': 'sucesso',
@@ -217,11 +226,14 @@ class User_Models:
             return  jsonify({
                 'status': 'erro',
                 "menssagem": 'permissoes insuficientes para realizacao operacao',
-                'codigorequisicao': 'in300',
+                'codigo-requisicao': 'in300',
             })
 
 
         usuario = self.db.select_one_object('usuarios', {'email': email_usuario})
+
+        if usuario is None:
+            raise UsuarioNaoEncontrado()
 
         if usuario['_id'] == ObjectId(id_usuario):
             return jsonify({
@@ -236,7 +248,7 @@ class User_Models:
         usuario['status'] = 'inativado'
 
         self.db.update_object(usuario, 'usuarios', {'email': email_usuario})
-        usuario = self.db.select_one_object(usuario,  {'email': email_usuario})
+        usuario = self.db.select_one_object('usuarios',  {'email': email_usuario})
         del usuario['_id']
 
         return jsonify({

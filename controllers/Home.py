@@ -1,7 +1,7 @@
 from controllers.database.database import Database
 from flask import request, jsonify, Blueprint
 from app import webapi
-from controllers.exceptions import UsuarioNaoEncontrado,  PermissaoInvalida, CampoIncorreto
+from controllers.exceptions import UsuarioNaoEncontrado,  PermissaoInvalida, CampoIncorreto, ImovelNaoEncontrado
 from acessos_token import Token
 from bson.objectid import ObjectId
 
@@ -89,4 +89,13 @@ def campo_incorreto(CampoIncorretoObject):
                 'status': 'erro',
                 'menssagem': f'preencha o campo {CampoIncorretoObject.campo} corretamente',
                 'codigo-requisicao': 'in10'
+    })
+
+
+@webapi.errorhandler(ImovelNaoEncontrado)
+def imovel_nao_encontrado(ImovelNaoEncontradoObject):
+    return jsonify({
+                'status': 'erro',
+                'menssagem': 'imovel nao encontrado no sistema',
+                'codigo-requisicao': 'in404'
     })
