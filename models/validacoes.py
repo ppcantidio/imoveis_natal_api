@@ -1,5 +1,5 @@
 import re
-from controllers.exceptions import CampoIncorreto
+from utils.exceptions import CampoIncorreto
 
 class Validacoes:
     

@@ -1,38 +1,11 @@
 from flask.views import MethodView
 from models.users_models import User_Models
 from flask import request, jsonify, Blueprint, session
-from functools import wraps
+from utils.sessions_requirements import nao_logado, login_requiered
 
 users_routes = Blueprint('users_routes', __name__)
 
 model = User_Models()
-
-def login_requiered(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return f(*args, **kwargs)
-        else:
-            return jsonify({
-                'status':'erro',
-                'menssagem': 'faca o login primeiro',
-                'codigo-requisicao': 'in300'
-                })
-
-    return wrap
-
-
-def nao_logado(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return jsonify({
-                'status':'erro',
-                'menssagem': 'voce ja esta logado',
-                'codigo-requisicao': 'in300'
-                })
-
-    return wrap
 
 class User(MethodView):
 
@@ -40,7 +13,7 @@ class User(MethodView):
     @login_requiered
     def criar_usuarios():
         user = model.criar_usuario(
-            usuario=session['usuario'],
+            usuario_requisitor=session['usuario'],
             nome=request.form.get('nome'),
             senha = request.form.get('senha'),
             email=request.form.get('email'),
@@ -55,7 +28,7 @@ class User(MethodView):
     @login_requiered
     def editar_usuario():       
         user = model.editar_usuario(
-            usuario=session['usuario'],
+            usuario_requisitor=session['usuario'],
             nome =request.form.get('nome'),
             email=request.form.get('email'),
             telefone=request.form.get('telefone')
@@ -68,8 +41,8 @@ class User(MethodView):
     @login_requiered
     def deletar_usuario():
         resultado = model.deletar_usuario(
-            usuario=session['usuario'],
-            email_usuario=request.form.get('email_usuario')
+            usuario_requisitor=session['usuario'],
+            id_requisitado=request.form.get('id_requisitado')
         )
 
         return resultado
@@ -81,7 +54,7 @@ class User(MethodView):
 
         usuario = model.inativar_usuario(
             usuario=session['usuario'],
-            email_usuario=request.form.get('email_usuario')
+            id_requisitado=request.form.get('id_requisitado')
         )
 
         return usuario
