@@ -3,10 +3,11 @@ from flask import session
 from flask.json import jsonify
 from acessos_token import Token
 from bson.objectid import ObjectId
+from imoveis_natal_api.utils.exceptions import SenhaIncorreta
 from passlib.hash import pbkdf2_sha256
 from models.validacoes import Validacoes
 from controllers.database.database import Database
-from utils.exceptions  import UsuarioNaoEncontrado, PermissaoInvalida
+from utils.exceptions  import UsuarioNaoEncontrado, PermissaoInvalida, SenhaIncorreta
 
 
 class User_Models:
@@ -17,14 +18,6 @@ class User_Models:
         self.token = Token()
 
         self.validacoes = Validacoes()
-
-
-    @staticmethod
-    def retorna_booleano(string):
-        if string == 'True':
-            return True
-        else:
-            return  False
 
 
     def iniciar_sessao(self, user):
@@ -48,14 +41,15 @@ class User_Models:
         if usuario['permissoes'][permissao]  ==  False:
             raise PermissaoInvalida()
 
-    def  criar_usuario(self, nome, email, telefone, senha, usuario_requisitor):
-        if usuario_requisitor['permissoes']['criari_usuario'] != True:
-            raise PermissaoInvalida()
+    def  criar_usuario(self, nome, email, telefone, senha):
+        # if usuario_requisitor['permissoes']['criari_usuario'] != True:
+        #     raise PermissaoInvalida()
 
         # validacao de dados
         self.validacoes.validar_email(email)
         self.validacoes.validar_nome(nome)
         self.validacoes.validar_telefone(telefone)
+        self.validacoes.validar_senha(senha)
 
         # verificacao de existencia de dados
         email_existe = self.db.select_one_object('usuarios', {'email': email})
@@ -87,11 +81,13 @@ class User_Models:
             'permissoes': {
                 'criar_usuarios': False,
                 'excluir_usuarios': False,
-                'aprovar_imoveis': False,
                 'excluir_imoveis': False,
                 'editar_imoveis': False,
-                'ocultar_imovies': False,
-                'editar_permissoes': False
+                'inativar_imoveis': False,
+                'ativar_imoveis': False,
+                'editar_permissoes': False,
+                'inativar_usuarios': False,
+                'ativar_usuarios': False
             }
         }
 
@@ -100,10 +96,6 @@ class User_Models:
         usuario = self.db.select_one_object('usuarios', {'email': email})
 
         del usuario['senha']
-
-        self.iniciar_sessao(usuario)
-
-        usuario['_id'] = str(usuario['_id'])
 
         return jsonify({
             'status': 'sucesso',
@@ -114,49 +106,37 @@ class User_Models:
 
 
     def editar_usuario(self, usuario_requisitor, nome, email, telefone):
-        nome = nome.strip()
+        # validacoes dos campos
+        usuario_requisitor = self.db.select_one_object('usuarios', usuario_requisitor['_id'])
 
-        if nome != '':
-            usuario_requisitor['nome'] = nome
+        self.validacoes.validar_nome(nome)
+        self.validacoes.validar_email(email)
+        self.validacoes.validar_telefone(telefone)
 
-        validacao_email = self.validacoes.validar_email(email)
-        validacao_telefone = self.validacoes.validar_telefone(telefone)
+        usuario_requisitor['nome'] = nome
+        usuario_requisitor['email'] = email
+        usuario_requisitor['telefone'] = telefone
 
-        if validacao_email is False:
-            return jsonify({
-                'status': 'erro',
-                'mensagem': 'preencha o campo email corretamente',
-                'codigo-requisicao': 'in10'
-            })
+        # atualizando no banco de dados
+        self.db.update_object(usuario_requisitor, 'usuarios', {'_id': usuario_requisitor['_id']})
 
-        if validacao_telefone is False:
-            return jsonify({
-                'status': 'erro',
-                'mensagem': 'preencha o campo telefone corretamente',
-                'codigo-requisicao': 'in10'
-            })
-
-        if telefone != '':
-            usuario_requisitor['telefone'] = telefone
-
-        if email != '':
-            usuario_requisitor['email'] = email
-
-        self.db.update_object(usuario_requisitor, 'usuarios', {'_id': id})
-        usuario = self.db.select_one_object('usuarios', {'_id': id})
-
+        usuario = self.db.select_one_object('usuarios', {'_id': usuario_requisitor['_id']})
         del usuario['senha']
+
+        session['usuario'] = usuario
 
         return jsonify({
             'status': 'sucesso',
             "menssagem": 'usuario editado com sucesso',
             'codigorequisicao': 'in200',
             'usuario': usuario
-        }) 
+        })
 
 
-    def editar_permissoes(self, usuario_requisitor, id_requisitado, criar_usuarios,  excluir_usuarios, aprovar_imoveis, excluir_imoveis, editar_imoveis, ocultar_imoveis):
+    def editar_permissoes(self, usuario_requisitor, id_requisitado, criar_usuarios,  excluir_usuarios, excluir_imoveis, editar_imoveis, inativar_imoveis, ativar_imoveis, editar_permissoes, inativar_usuarios, ativar_usuarios):
         # verificacao de permissoes
+        usuario_requisitor = self.db.select_one_object('usuarios', {'_id': usuario_requisitor['_id']})
+
         if usuario_requisitor['permissoes']['editar_permissoes'] != True:
             raise PermissaoInvalida()
         
@@ -170,12 +150,15 @@ class User_Models:
             
         perimissoes_usuario = usuario['permissoes']
 
-        perimissoes_usuario['criar_usuarios'] = self.retorna_booleano(criar_usuarios)
-        perimissoes_usuario['excluir_usuarios'] = self.retorna_booleano(excluir_usuarios)
-        perimissoes_usuario['aprovar_imoveis'] = self.retorna_booleano(aprovar_imoveis)
-        perimissoes_usuario['excluir_imoveis'] = self.retorna_booleano(excluir_imoveis)
-        perimissoes_usuario['editar_imoveis'] = self.retorna_booleano(editar_imoveis)
-        perimissoes_usuario['ocultar_imoveis'] = self.retorna_booleano(ocultar_imoveis)
+        perimissoes_usuario['criar_usuarios'] = self.validacoes.booleano(criar_usuarios)
+        perimissoes_usuario['excluir_usuarios'] = self.validacoes.booleano(excluir_usuarios)
+        perimissoes_usuario['excluir_imoveis'] = self.validacoes.booleano(excluir_imoveis)
+        perimissoes_usuario['editar_imoveis'] = self.validacoes.booleano(editar_imoveis)
+        perimissoes_usuario['inativar_imoveis'] = self.validacoes.booleano(inativar_imoveis)
+        perimissoes_usuario['ativar_imoveis'] = self.validacoes.booleano(ativar_imoveis)
+        perimissoes_usuario['editar_permissoes'] = self.validacoes.booleano(editar_imoveis)
+        perimissoes_usuario['inativar_usuarios'] = self.validacoes.booleano(inativar_usuarios)
+        perimissoes_usuario['ativar_usuarios'] = self.validacoes.booleano(ativar_usuarios)
 
         usuario['permissoes'] =  perimissoes_usuario
         usuario = self.db.update_object(usuario, 'usuarios', {'_id': id_requisitado})
@@ -193,6 +176,8 @@ class User_Models:
 
 
     def deletar_usuario(self, id_requisitado, usuario_requisitor):
+        usuario_requisitor = self.db.select_one_object('usuarios', {'_id': usuario_requisitor['_id']})
+
         if usuario_requisitor['permissoes']['excluir_usuarios'] != True:
             raise PermissaoInvalida()
 
@@ -204,11 +189,7 @@ class User_Models:
             raise PermissaoInvalida()
 
         if usuario['_id'] == id:
-            return jsonify({
-                'status': 'erro',
-                'menssagem': 'voce nao pode excluir seu proprio usuario',
-                'codigorequisicao': 'in300'
-            })
+            raise PermissaoInvalida()
 
         if usuario is None:
             raise UsuarioNaoEncontrado()
@@ -242,6 +223,7 @@ class User_Models:
 
     def inativar_usuario(self, usuario,  id_requisitado):
         usuario_requisitor = usuario
+        usuario_requisitor = self.db.select_one_object('usuarios', {'_id': usuario_requisitor['_id']})
         if usuario_requisitor['permissoes']['inativar_usuarios'] != True:
             raise PermissaoInvalida()
 
@@ -254,11 +236,7 @@ class User_Models:
             raise PermissaoInvalida()
 
         if usuario['_id'] == usuario_requisitor['_id']:
-            return jsonify({
-                'status': 'erro',
-                'menssagem': 'voce nao pode inativar seu proprio usuario',
-                'codigorequisicao': 'in300'
-            })
+            raise PermissaoInvalida()
 
         if usuario is None:
             raise UsuarioNaoEncontrado()
@@ -278,6 +256,8 @@ class User_Models:
 
 
     def ativar_usuario(self, usuario_requisitor,  id_requisitado):
+        usuario_requisitor = self.db.select_one_object('usuarios', {'_id': usuario_requisitor['_id']})
+
         if usuario_requisitor['permissoes']['inativar_usuarios'] != True:
             raise PermissaoInvalida()
 
@@ -309,12 +289,13 @@ class User_Models:
 
     def login(self, email, senha):
         usuario = self.db.select_one_object('usuarios', {'email': email})
+        print(email)
 
         if usuario is None:
             raise UsuarioNaoEncontrado()
 
-        if pbkdf2_sha256.verify(usuario[senha], usuario['senha']):
-            self.iniciar_sessao()
+        if pbkdf2_sha256.verify(senha, usuario['senha']):
+            self.iniciar_sessao(usuario)
 
             del usuario['senha']
 
@@ -325,9 +306,16 @@ class User_Models:
                 'usuario': usuario
             })
 
-        return jsonify({
-            'status': 'erro',
-            'menssagem': 'senha incorreta',
-            'codigo-requisicao': 'in401'
-        })
+        raise SenhaIncorreta()
         
+
+    def exibir_usuario(self, usuario_id):
+        usuario = self.db.select_one_object('usuarios', {'_id': usuario_id})
+        del usuario['senha']
+
+        return jsonify({
+            'status': 'sucesso',
+            'menssagem-requisicao': 'usuario encontrado com sucesso',
+            'codigo-requisicao': 'in200',
+            'usuario': usuario
+        })

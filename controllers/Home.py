@@ -1,7 +1,7 @@
 from controllers.database.database import Database
 from flask import request, jsonify, Blueprint
 from app import webapi
-from utils.exceptions import UsuarioNaoEncontrado,  PermissaoInvalida, CampoIncorreto, ImovelNaoEncontrado
+from utils.exceptions import UsuarioNaoEncontrado,  PermissaoInvalida, CampoIncorreto, ImovelNaoEncontrado, SenhaIncorreta
 from acessos_token import Token
 from bson.objectid import ObjectId
 
@@ -70,7 +70,7 @@ def page_not_found(e):
 def usuario_nao_encontrado(UsuarioNaoEncontradoObject):
     return jsonify({
                 'status': 'erro',
-                'menssagem': 'usuario nao  encontrado',
+                'menssagem': 'usuario não  encontrado no sistema',
                 'codigo-requisicao':  'in404'
             })
 
@@ -79,7 +79,7 @@ def usuario_nao_encontrado(UsuarioNaoEncontradoObject):
 def permissao_invalida(PermissaoInvalidaObject):
     return jsonify({
                 'status': 'erro',
-                'menssagem': 'permissao invalida',
+                'menssagem': 'permissão invalida',
                 'codigo-requisicao':  'in404'
             })
 
@@ -88,7 +88,7 @@ def permissao_invalida(PermissaoInvalidaObject):
 def campo_incorreto(CampoIncorretoObject):
     return jsonify({
                 'status': 'erro',
-                'menssagem': f'preencha o campo {CampoIncorretoObject.campo} corretamente',
+                'menssagem': f'o campo {CampoIncorretoObject.campo} não foi preenchido corretamente',
                 'codigo-requisicao': 'in10'
     })
 
@@ -97,6 +97,15 @@ def campo_incorreto(CampoIncorretoObject):
 def imovel_nao_encontrado(ImovelNaoEncontradoObject):
     return jsonify({
                 'status': 'erro',
-                'menssagem': 'imovel nao encontrado no sistema',
+                'menssagem': 'imovel não encontrado no sistema',
+                'codigo-requisicao': 'in404'
+    })
+
+
+@webapi.errorhandler(SenhaIncorreta)
+def imovel_nao_encontrado(SenhaIncorretaObject):
+    return jsonify({
+                'status': 'erro',
+                'menssagem': 'senha incorreta',
                 'codigo-requisicao': 'in404'
     })

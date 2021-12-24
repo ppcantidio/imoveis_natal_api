@@ -25,5 +25,7 @@ def nao_logado(f):
                 'menssagem': 'voce ja esta logado',
                 'codigo-requisicao': 'in300'
                 })
-
+        else:
+            return f(*args, **kwargs)
+            
     return wrap

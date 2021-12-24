@@ -10,10 +10,9 @@ model = User_Models()
 class User(MethodView):
 
     @users_routes.route('/criar', methods=['POST'])
-    @login_requiered
     def criar_usuarios():
         user = model.criar_usuario(
-            usuario_requisitor=session['usuario'],
+            #usuario_requisitor=session['usuario'],
             nome=request.form.get('nome'),
             senha = request.form.get('senha'),
             email=request.form.get('email'),
@@ -61,6 +60,7 @@ class User(MethodView):
 
     
     @users_routes.route('/ativar', methods=['POST'])
+    @login_requiered
     def ativar_usuario():
         usuario = model.ativar_usuario(
             usuario_requisitor=session['usuario'],
@@ -78,10 +78,13 @@ class User(MethodView):
             id_requisitado=request.form.get('id_requisitado'),
             criar_usuarios=request.form.get('criar_usuarios'),
             excluir_usuarios=request.form.get('excluir_usuarios'),
-            aprovar_imoveis=request.form.get('aprovar_imoveis'),
             excluir_imoveis=request.form.get('excluir_imoveis'),
             editar_imoveis=request.form.get('editar_imoveis'),
-            ocultar_imoveis=request.form.get('ocultar_imoveis')
+            inativar_imoveis=request.form.get('inativar_imoveis'),
+            ativar_imoveis=request.form.get('ativar_imoveis'),
+            editar_permissoes=request.form.get('editar_permissoes'),
+            inativar_usuarios=request.form.get('inativar_usuarios'),
+            ativar_usuarios=request.form.get('ativar_usuarios'),
         )
 
         return user
@@ -110,3 +113,15 @@ class User(MethodView):
         )
 
         return login
+
+
+    @users_routes.route('/perfil', methods=['GET'])
+    @login_requiered
+    def exibir_perfil():
+        usuario = model.exibir_usuario(
+            usuario_id=session['usuario']['_id']
+        )
+
+        return usuario
+
+    

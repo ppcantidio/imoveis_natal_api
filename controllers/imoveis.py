@@ -10,8 +10,8 @@ model = Imoveis_Models()
 class Imoveis(MethodView):
 
 
-    @login_requiered
     @imoveis_routes.route('/criar', methods=['POST'])
+    @login_requiered
     def criar_imovel():
         imovel = model.criar_imovel(
             usuario=session['usuario'],
@@ -29,7 +29,6 @@ class Imoveis(MethodView):
             elevador_servico=request.form.get('elevadores'),
             piscina_coletiva=request.form.get('piscina_infantil'),
             interfone=request.form.get('interfone'),
-            piscina_coletiva=request.form.get('piscina_coletiva'),
             quadra_esportes=request.form.get('quadra_esportes'),
             jardim=request.form.get('jardim'),
             playground=request.form.get('playground'),
@@ -44,8 +43,8 @@ class Imoveis(MethodView):
         return imovel
 
     
-    @login_requiered
     @imoveis_routes.route('/exibir', methods=['GET'])
+    @login_requiered
     def exibir_imovel():
         imovel_id = request.args.get('id')
 
@@ -60,8 +59,8 @@ class Imoveis(MethodView):
         return model.exibir_todos_imoveis()
 
 
-    @login_requiered
     @imoveis_routes.route('/editar', methods=['POST'])
+    @login_requiered
     def editar_imovel():
         imovel = model.editar_imovel(
             usuario=session['usuario'],
@@ -71,8 +70,8 @@ class Imoveis(MethodView):
         return imovel
 
 
-    @login_requiered
     @imoveis_routes.route('/excluir', methods=['POST'])
+    @login_requiered
     def excluir_imovel(self):
         imovel = model.excluir_imovel(
             imovel_id=request.form.get('imovel_id'),

@@ -10,3 +10,10 @@ class CampoIncorreto(Exception):
 
 class ImovelNaoEncontrado(Exception):
     pass
+
+class ErroGenerico(Exception):
+    def __init__(self, menssagem):
+        self.menssagem = menssagem
+
+class SenhaIncorreta(Exception):
+    pass

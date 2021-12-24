@@ -16,7 +16,7 @@ class Imoveis_Models():
 
     
     def criar_imovel(self, usuario, titulo, descricao, categoria, tipo, cidade, bairro, valor, tamanho, quartos,
-     suites, banheiros, vagas_garagem, elevador_servico, piscina_infantil, interfone, piscina_coletiva, quadra_esportes,
+     suites, banheiros, vagas_garagem, elevador_servico, piscina_infantil, interfone, quadra_esportes,
      jardim, playground, academia, espaco_gourmet, lavanderia, portaria24h, salao_festas, link_youtube):
         corretor = usuario
         codigo_imovel = ''
@@ -32,35 +32,51 @@ class Imoveis_Models():
             if imovel  ==  None:
                 verify = True
         
+        tipos = ['apartamento', 'casa', 'casa_comercial', 'casa_condominio', 'cobertura', 'flat', 'ponto_comercial']
+        categorias = ['venda', 'locacao']
+
+        if categoria not in categorias:
+            return jsonify({
+                'status': 'erro',
+                'menssagem': 'categoria invalida',
+                'codigo-requisicao': 'in303'
+            })
+
+        if tipo not in tipos:
+            return jsonify({
+                'status': 'erro',
+                'menssagem': 'tipo invalido',
+                'codigo-requisicao': 'in303'
+            })
+
         imovel = {
             '_id': uuid.uuid4().hex,
             'codigo': codigo_imovel,
             'corretor_id': corretor['_id'],
-            'titulo': titulo,
-            'descricao': descricao,
+            'titulo': self.validacoes.string(titulo, 50, 'titulo'),
+            'descricao': self.validacoes.string(descricao, 2000, 'descricao'),
             'categoria': categoria,
             'tipo': tipo,
             'cidade': cidade,
             'bairro': bairro,
-            'valor': valor,
-            'tamanho': tamanho,
-            'quartos': quartos,
-            'suites': suites,
-            'banheiros': banheiros,
-            'vagas_garagem': vagas_garagem,
+            'valor': self.validacoes.int(valor, 9, 'valor'),
+            'tamanho': self.validacoes.int(tamanho, 9, 'tamanho'),
+            'quartos': self.validacoes.int(quartos, 2, 'quartos'),
+            'suites': self.validacoes.int(suites, 2, 'suites'),
+            'banheiros': self.validacoes.int(banheiros, 2, 'banheiuros'),
+            'vagas_garagem': self.validacoes.int(vagas_garagem, 2, 'vagas_garagem'),
             'extras':{
-                'piscina_infantil': piscina_infantil,
-                'interfone': interfone,
-                'piscina_coletiva': piscina_coletiva,
-                'quadra_esportes': quadra_esportes,
-                'jardim': jardim,
-                'playground': playground,
-                'academia': academia,
-                'espaco_gourmet': espaco_gourmet,
-                'lavanderia': lavanderia,
-                'portaria24h': portaria24h,
-                'elevador_servico': elevador_servico,
-                'sala_festas': salao_festas
+                'piscina_infantil': self.validacoes.booleano(piscina_infantil),
+                'interfone': self.validacoes.booleano(interfone),
+                'quadra_esportes': self.validacoes.booleano(quadra_esportes),
+                'jardim': self.validacoes.booleano(jardim),
+                'playground': self.validacoes.booleano(playground),
+                'academia': self.validacoes.booleano(academia),
+                'espaco_gourmet': self.validacoes.booleano(espaco_gourmet),
+                'lavanderia': self.validacoes.booleano(lavanderia),
+                'portaria24h': self.validacoes.booleano(portaria24h),
+                'elevador_servico': self.validacoes.booleano(elevador_servico),
+                'sala_festas': self.validacoes.booleano(salao_festas)
             },
             'imagens': {},
             'link_youtube': link_youtube,
