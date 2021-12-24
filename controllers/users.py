@@ -136,3 +136,4 @@ class User(MethodView):
         )
 
         return usuario
+        

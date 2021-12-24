@@ -219,3 +219,21 @@ class Imoveis_Models():
     
     def ativar_imovel(self):
         pass
+
+
+    def imoveis_corretor(self, id):
+        imoveis = self.db.select_object('imoveis', {'corretor_id':  id})
+
+        if imoveis == None:
+            raise ImovelNaoEncontrado()
+
+        return jsonify({
+            'status': 'sucesso',
+            'menssagem': 'imoveis encontrados com sucesso',
+            'codigo-requisicao': 'in200',
+            'imovel': imoveis
+        })
+
+
+    def imovel_codigo(self, codigo_imovel):
+        imovel = self.db.select_one_object('imoveis', {'codigo_imovel': codigo_imovel})

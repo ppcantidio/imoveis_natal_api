@@ -18,7 +18,7 @@ class Database:
 
     def select_object(self, collection, where):
         collection = self.db.get_collection(collection)
-        results = collection.find(where)
+        results = list(collection.find(where))
 
         return results
 

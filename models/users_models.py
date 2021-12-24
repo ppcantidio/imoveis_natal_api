@@ -27,7 +27,6 @@ class User_Models:
         return user
         
 
-
     def verifica_permissao(self, token, permissao, email=None):
         if email is not None:
             verifica_usuario_adm = self.db.select_one_object('usuarios', {'email': email})
@@ -41,6 +40,7 @@ class User_Models:
 
         if usuario['permissoes'][permissao]  ==  False:
             raise PermissaoInvalida()
+
 
     def  criar_usuario(self, nome, email, telefone, senha):
         # if usuario_requisitor['permissoes']['criari_usuario'] != True:
@@ -195,6 +195,9 @@ class User_Models:
         if usuario is None:
             raise UsuarioNaoEncontrado()
 
+        
+        self.db.delete_many('imoveis', {'corretor_id': usuario['_id']})
+
         self.db.delete_one('usuarios', {'_id': id_requisitado})
 
         return jsonify({
@@ -242,6 +245,11 @@ class User_Models:
         if usuario is None:
             raise UsuarioNaoEncontrado()
 
+        imoveis = self.db.select_object('imoveis', {'corretor_id': usuario['_id']})
+        for imovel in imoveis:
+            imovel['status'] = 'inativo_temporario'
+            self.db.update_object(imovel, 'imoveis', {'_id': imovel['_id']})
+
         usuario['status'] = 'inativado'
 
         self.db.update_object(usuario, 'usuarios', {'_id': id_requisitado})
@@ -270,6 +278,12 @@ class User_Models:
         if usuario is None:
             raise UsuarioNaoEncontrado()
 
+        imoveis = self.db.select_object('imoveis', {'corretor_id': usuario['_id']})
+        for imovel in imoveis:
+            if imovel['status'] == 'inativo_temporario':
+                imovel['status'] = 'ativado'
+                self.db.update_object(imovel, 'imoveis', {'_id': imovel['_id']})
+
         usuario['status'] = 'ativado'
 
         self.db.update_object(usuario, 'usuarios', {'_id': id_requisitado})
@@ -283,9 +297,14 @@ class User_Models:
             'usuario': usuario
         })
 
+
     def signout(self):
         session.clear()
-        return jsonify({'deslogado': 'sucesso'})
+        return jsonify({
+            'status': 'sucesso',
+            'menssagem': 'sessão encerrada com sucesso',
+            'codigo-requisicao': 'in200'
+            })
 
 
     def login(self, email, senha):

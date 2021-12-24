@@ -77,3 +77,32 @@ class Imoveis(MethodView):
             imovel_id=request.form.get('imovel_id'),
             usuario=session['usuario']
         )
+
+        return imovel
+
+
+    @imoveis_routes.route('/meus_imoveis', methods=['GET'])
+    @login_requiered
+    def meus_imoveis():
+        imoveis = model.imoveis_corretor(
+            id=session['usuario']['_id']
+        )
+
+        return imoveis
+    
+    @imoveis_routes.route('/corretor', methods=['GET'])
+    def imoveis_corretor():
+        imoveis = model.imoveis_corretor(
+            id=request.args.get('id_requisitado')
+        )
+
+        return imoveis
+
+
+    @imoveis_routes.route('/imovel', methods=['GET'])
+    def imovel_codigo():
+        imovel = model.imovel_codigo(
+            codigo_imovel = request.args.get('codigo_imovel')
+        )
+
+        return imovel
