@@ -1,5 +1,5 @@
-import re
-import json
+import uuid
+import random
 from flask.json import jsonify
 from bson.objectid import ObjectId
 from utils.exceptions import PermissaoInvalida
@@ -15,19 +15,55 @@ class Imoveis_Models():
         self.validacoes = Validacoes()
 
     
-    def criar_imovel(self, usuario, titulo, tamanho, preco, quartos, banheiros, area_lazer, vagas_garagem, elevador, descricao):
+    def criar_imovel(self, usuario, titulo, descricao, categoria, tipo, cidade, bairro, valor, tamanho, quartos,
+     suites, banheiros, vagas_garagem, elevador_servico, piscina_infantil, interfone, piscina_coletiva, quadra_esportes,
+     jardim, playground, academia, espaco_gourmet, lavanderia, portaria24h, salao_festas, link_youtube):
         corretor = usuario
+        codigo_imovel = ''
+        verify = False
+
+        while verify == False:
+            for x in range(5):
+                numero = random.randrange(0,9)
+                codigo_imovel += str(numero)
+
+            imovel = self.db.select_one_object('imoveis', {'codigo': codigo_imovel})
+
+            if imovel  ==  None:
+                verify = True
+        
         imovel = {
+            '_id': uuid.uuid4().hex,
+            'codigo': codigo_imovel,
             'corretor_id': corretor['_id'],
             'titulo': titulo,
             'descricao': descricao,
+            'categoria': categoria,
+            'tipo': tipo,
+            'cidade': cidade,
+            'bairro': bairro,
+            'valor': valor,
             'tamanho': tamanho,
-            'preco': preco,
             'quartos': quartos,
+            'suites': suites,
             'banheiros': banheiros,
-            'area_lazer': area_lazer,
             'vagas_garagem': vagas_garagem,
-            'elevador': elevador,
+            'extras':{
+                'piscina_infantil': piscina_infantil,
+                'interfone': interfone,
+                'piscina_coletiva': piscina_coletiva,
+                'quadra_esportes': quadra_esportes,
+                'jardim': jardim,
+                'playground': playground,
+                'academia': academia,
+                'espaco_gourmet': espaco_gourmet,
+                'lavanderia': lavanderia,
+                'portaria24h': portaria24h,
+                'elevador_servico': elevador_servico,
+                'sala_festas': salao_festas
+            },
+            'imagens': {},
+            'link_youtube': link_youtube,
             'status': 'inativo'
         }
 
@@ -40,6 +76,7 @@ class Imoveis_Models():
             'imovel': imovel
 
         })
+
 
     def exbir_imovel(self, imovel_id):
         imovel = self.db.select_one_object('imoveis', {'_id': imovel_id})

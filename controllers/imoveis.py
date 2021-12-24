@@ -15,16 +15,30 @@ class Imoveis(MethodView):
     def criar_imovel():
         imovel = model.criar_imovel(
             usuario=session['usuario'],
-            categoria=request.form.get('categoria'),
             titulo=request.form.get('titulo'),
+            descricao=request.form.get('descricao'),
+            categoria=request.form.get('categoria'),
+            tipo=request.form.get('tipo'),
+            cidade=request.form.get('cidade'),
+            bairro=request.form.get('bairro'),
+            valor=request.form.get('valor'),
             tamanho=request.form.get('tamanho'),
-            preco=request.form.get('preco'),
             quartos=request.form.get('quartos'),
-            banheiros=request.form.get('banheiros'),
-            area_lazer=request.form.get('area_lazer'),
+            suites=request.form.get('suites'),
             vagas_garagem=request.form.get('vagas_garagem'),
-            elevador=request.form.get('elevador'),
-            descricao=request.form.get('descricao')
+            elevador_servico=request.form.get('elevadores'),
+            piscina_coletiva=request.form.get('piscina_infantil'),
+            interfone=request.form.get('interfone'),
+            piscina_coletiva=request.form.get('piscina_coletiva'),
+            quadra_esportes=request.form.get('quadra_esportes'),
+            jardim=request.form.get('jardim'),
+            playground=request.form.get('playground'),
+            academia=request.form.get('academia'),
+            espaco_gourmet=request.form.get('espaco_gourmet'),
+            lavanderia=request.form.get('lavanderia'),
+            portaria24h=request.form.get('portaria24h'),
+            salao_festas=request.form.get('salao_festas'),
+            link_youtube=request.form.get('link_youtube')
         )
 
         return imovel
