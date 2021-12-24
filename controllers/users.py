@@ -125,3 +125,11 @@ class User(MethodView):
         return usuario
 
     
+    @users_routes.route('/trocar_senha', methods=['POST'])
+    @login_requiered
+    def trocar_senha():
+        usuario = model.trocar_senha(
+            usuario_requisitor=session['usuario']
+        )
+
+        return usuario

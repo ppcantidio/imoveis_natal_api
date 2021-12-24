@@ -3,7 +3,6 @@ from flask import session
 from flask.json import jsonify
 from acessos_token import Token
 from bson.objectid import ObjectId
-from imoveis_natal_api.utils.exceptions import SenhaIncorreta
 from passlib.hash import pbkdf2_sha256
 from models.validacoes import Validacoes
 from controllers.database.database import Database
@@ -319,3 +318,23 @@ class User_Models:
             'codigo-requisicao': 'in200',
             'usuario': usuario
         })
+
+
+    def trocar_senha(self, usuario_requisitor, senha_atual, senha_nova, senha_repetida):
+        usuario_requisitor = self.db.select_one_object('usuarios', {'_id': usuario_requisitor['_id']})
+
+        if pbkdf2_sha256.verify(senha_atual, usuario_requisitor['senha']):
+            if senha_nova != senha_repetida:
+                return jsonify({
+                    'status': 'erro',
+                    'menssagem': 'as duas senhas não coincidem',
+                    'codigo-requisicao': 'in400'
+                })
+            
+            return jsonify({
+                    'status': 'sucesso',
+                    'menssagem': 'senha alterada com sucesso',
+                    'codigo-requisicao': 'in200'
+                })
+        
+        raise SenhaIncorreta()
