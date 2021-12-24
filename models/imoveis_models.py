@@ -18,7 +18,7 @@ class Imoveis_Models():
     def criar_imovel(self, usuario, titulo, descricao, categoria, tipo, cidade, bairro, valor, tamanho, quartos,
      suites, banheiros, vagas_garagem, elevador_servico, piscina_infantil, interfone, quadra_esportes,
      jardim, playground, academia, espaco_gourmet, lavanderia, portaria24h, salao_festas, link_youtube):
-        corretor = usuario
+        corretor = self.db.select_one_object('usuarios', {'_id': usuario['_id']})
         codigo_imovel = ''
         verify = False
 
@@ -85,7 +85,6 @@ class Imoveis_Models():
 
         self.db.insert_object(imovel, 'imoveis')
 
-        del imovel['corretor_id']
         return jsonify({
             'status': 'sucesso',
             'menssagem': 'imovel criado com sucesso',
@@ -127,6 +126,8 @@ class Imoveis_Models():
 
     
     def editar_imovel(self, usuario, imovel_id, categoria, titulo, tamanho, preco, quartos, banheiros, area_lazer, vagas_garagem, elevador, descricao):
+        usuario = self.db.select_one_object('usuarios', {'_id': usuario['_id']})
+
         imovel = self.db.select_one_object('imoveis', {'_id': imovel_id})
 
         corretor_id = imovel['corretor_id']
@@ -177,6 +178,8 @@ class Imoveis_Models():
 
 
     def excluir_imovel(self, imovel_id, usuario):
+        usuario = self.db.select_one_object('usuarios', {'_id': usuario['_id']})
+
         imovel = self.db.select_one_object('imoveis', {'_id': imovel_id})
 
         if imovel['corretor_id'] != usuario['_id']:
@@ -193,6 +196,8 @@ class Imoveis_Models():
 
 
     def inativar_imovel(self, imovel_id, usuario):
+        usuario = self.db.select_one_object('usuarios', {'_id': usuario['_id']})
+
         imovel = self.db.select_one_object('imoveis', {'_id': imovel_id})
 
         if imovel['corretor_id'] != usuario['_id']:

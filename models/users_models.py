@@ -23,6 +23,8 @@ class User_Models:
         del user['senha']
         session['logged_in'] = True
         session['usuario'] = user
+
+        return user
         
 
 
@@ -288,15 +290,12 @@ class User_Models:
 
     def login(self, email, senha):
         usuario = self.db.select_one_object('usuarios', {'email': email})
-        print(email)
 
         if usuario is None:
             raise UsuarioNaoEncontrado()
 
         if pbkdf2_sha256.verify(senha, usuario['senha']):
-            self.iniciar_sessao(usuario)
-
-            del usuario['senha']
+            usuario = self.iniciar_sessao(usuario)
 
             return jsonify({
                 'status': 'sucesso',

@@ -129,7 +129,10 @@ class User(MethodView):
     @login_requiered
     def trocar_senha():
         usuario = model.trocar_senha(
-            usuario_requisitor=session['usuario']
+            usuario_requisitor=session['usuario'],
+            senha_atual=request.form.get('senha_atual'),
+            senha_nova=request.form.get('senha_nova'),
+            senha_repetida=request.form.get('senha_repetida')
         )
 
         return usuario
