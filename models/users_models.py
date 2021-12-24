@@ -247,10 +247,10 @@ class User_Models:
 
         imoveis = self.db.select_object('imoveis', {'corretor_id': usuario['_id']})
         for imovel in imoveis:
-            imovel['status'] = 'inativo_temporario'
+            imovel['status'] = 'inativo'
             self.db.update_object(imovel, 'imoveis', {'_id': imovel['_id']})
 
-        usuario['status'] = 'inativado'
+        usuario['status'] = 'inativo'
 
         self.db.update_object(usuario, 'usuarios', {'_id': id_requisitado})
         usuario = self.db.select_one_object('usuarios',  {'_id': id_requisitado})
@@ -278,13 +278,7 @@ class User_Models:
         if usuario is None:
             raise UsuarioNaoEncontrado()
 
-        imoveis = self.db.select_object('imoveis', {'corretor_id': usuario['_id']})
-        for imovel in imoveis:
-            if imovel['status'] == 'inativo_temporario':
-                imovel['status'] = 'ativado'
-                self.db.update_object(imovel, 'imoveis', {'_id': imovel['_id']})
-
-        usuario['status'] = 'ativado'
+        usuario['status'] = 'ativo'
 
         self.db.update_object(usuario, 'usuarios', {'_id': id_requisitado})
         usuario = self.db.select_one_object('usuarios',  {'_id': id_requisitado})
