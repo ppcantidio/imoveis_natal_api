@@ -21,16 +21,26 @@ def login_requiered(f):
 
     return wrap
 
-class User(MethodView):
 
+def nao_logado(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return jsonify({
+                'status':'erro',
+                'menssagem': 'voce ja esta logado',
+                'codigo-requisicao': 'in300'
+                })
+
+    return wrap
+
+class User(MethodView):
 
     @users_routes.route('/criar', methods=['POST'])
     @login_requiered
     def criar_usuarios():
-        headers = request.headers
-
         user = model.criar_usuario(
-            #token=headers['token'],
+            usuario=session['usuario'],
             nome=request.form.get('nome'),
             senha = request.form.get('senha'),
             email=request.form.get('email'),
@@ -40,16 +50,13 @@ class User(MethodView):
         return user
         
 
+    # lembrar de editar essa funcao nos models
     @users_routes.route('/editar', methods=['POST'])
     @login_requiered
-    def editar_usuario():
-        headers = request.headers
-        
+    def editar_usuario():       
         user = model.editar_usuario(
-            
-            token=headers['token'],
+            usuario=session['usuario'],
             nome =request.form.get('nome'),
-            #senha = request.form('senha'),
             email=request.form.get('email'),
             telefone=request.form.get('telefone')
         )
@@ -60,10 +67,8 @@ class User(MethodView):
     @users_routes.route('/deletar', methods=['POST'])
     @login_requiered
     def deletar_usuario():
-        headers = request.headers
-        print(session)
         resultado = model.deletar_usuario(
-            usuario=session['user'],
+            usuario=session['usuario'],
             email_usuario=request.form.get('email_usuario')
         )
 
@@ -73,10 +78,9 @@ class User(MethodView):
     @users_routes.route('/inativar', methods=['POST'])
     @login_requiered
     def inativar_usuario():
-        headers = request.headers
 
         usuario = model.inativar_usuario(
-            token=headers['token'],
+            usuario=session['usuario'],
             email_usuario=request.form.get('email_usuario')
         )
 
@@ -85,11 +89,9 @@ class User(MethodView):
     
     @users_routes.route('/ativar', methods=['POST'])
     def ativar_usuario():
-        headers = request.headers
-
         usuario = model.ativar_usuario(
-            token=headers['token'],
-            email_usuario=request.form.get('email_usuario')
+            usuario_requisitor=session['usuario'],
+            id_requisitado=request.form.get('id_requisitado')
         )
 
         return usuario
@@ -98,11 +100,9 @@ class User(MethodView):
     @users_routes.route('/permissoes', methods=['POST'])
     @login_requiered
     def editar_permissoes():
-        headers = request.headers
-
         user = model.editar_permissoes(
-            token=headers['token'],
-            email_usuario=request.form.get('email'),
+            usuario_requisitor=session['usuario'],
+            id_requisitado=request.form.get('id_requisitado'),
             criar_usuarios=request.form.get('criar_usuarios'),
             excluir_usuarios=request.form.get('excluir_usuarios'),
             aprovar_imoveis=request.form.get('aprovar_imoveis'),
@@ -126,6 +126,7 @@ class User(MethodView):
 
 
     @users_routes.route('/login', methods=['POST'])
+    @nao_logado
     def login():
         email = request.form.get('email')
         senha = request.form.get('senha')
