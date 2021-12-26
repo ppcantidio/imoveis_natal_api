@@ -42,18 +42,8 @@ class Imoveis(MethodView):
 
         return imovel
 
-    
-    @imoveis_routes.route('/exibir', methods=['GET'])
-    @login_requiered
-    def exibir_imovel():
-        imovel_id = request.args.get('id')
 
-        imovel = model.exbir_imovel(imovel_id)
-
-        return imovel
-
-
-    @imoveis_routes.route('/exibir/todos', methods=['GET'])
+    @imoveis_routes.route('exibit/todos', methods=['GET'])
     def exibir_todos_imoveis():
 
         return model.exibir_todos_imoveis()
@@ -84,25 +74,25 @@ class Imoveis(MethodView):
     @imoveis_routes.route('/meus_imoveis', methods=['GET'])
     @login_requiered
     def meus_imoveis():
-        imoveis = model.imoveis_corretor(
-            id=session['usuario']['_id']
-        )
-
-        return imoveis
-    
-    @imoveis_routes.route('/corretor', methods=['GET'])
-    def imoveis_corretor():
-        imoveis = model.imoveis_corretor(
-            id=request.args.get('id_requisitado')
+        imoveis = model.busca_personalizada(
+            corretor_id=session['usuario']['_id']
         )
 
         return imoveis
 
 
-    @imoveis_routes.route('/imovel', methods=['GET'])
-    def imovel_codigo():
-        imovel = model.imovel_codigo(
-            codigo_imovel = request.args.get('codigo_imovel')
+    @imoveis_routes.route('/busca', methods=['GET'])
+    def exibir_imovel():
+        
+        imoveis = model.busca_personalizada(
+            tipo=request.args.get('tipo'),
+            categoria=request.args.get('categoria'),
+            bairro=request.args.get('bairro'),
+            valor=request.args.get('valor'),
+            quartos=request.args.get('quartos'),
+            imovel_id=request.args.get('imovel_id'),
+            corretor_id=request.args.get('corretor_id'),
+
         )
 
-        return imovel
+        return imoveis

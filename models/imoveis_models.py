@@ -1,7 +1,10 @@
+import re
 import uuid
 import random
+from datetime import date, datetime
 from flask.json import jsonify
 from bson.objectid import ObjectId
+from pymongo.common import validate
 from utils.exceptions import PermissaoInvalida
 from models.validacoes import Validacoes
 from utils.exceptions import ImovelNaoEncontrado
@@ -50,8 +53,7 @@ class Imoveis_Models():
             })
 
         imovel = {
-            '_id': uuid.uuid4().hex,
-            'codigo': codigo_imovel,
+            '_id': codigo_imovel,
             'corretor_id': corretor['_id'],
             'titulo': self.validacoes.string(titulo, 50, 'titulo'),
             'descricao': self.validacoes.string(descricao, 2000, 'descricao'),
@@ -80,6 +82,8 @@ class Imoveis_Models():
             },
             'imagens': {},
             'link_youtube': link_youtube,
+            'data_criacao': datetime.now(),
+            'ultima_atualizacao':  datetime.now(),
             'status': 'inativo'
         }
 
@@ -93,35 +97,16 @@ class Imoveis_Models():
         })
 
 
-    def exbir_imovel(self, imovel_id):
-        imovel = self.db.select_one_object('imoveis', {'_id': imovel_id})
-
-        if imovel is None:
-            raise ImovelNaoEncontrado()
-
-        imovel['_id'] = str(imovel['_id'])
-
-        return jsonify({
-            'status': 'sucesso',
-            'menssagem': 'imovel encontrado com sucesso',
-            'codigo-requsicao': 'in200',
-            'imovel': imovel
-        })
-
-
     def exibir_todos_imoveis(self):
-        imoveis_list = []
-        imoveis = self.db.select_all_objects('imoveis')
-
-        for imovel in imoveis:
-            imovel['_id'] = str(imovel['_str'])
-            imoveis_list.append(imovel)
+        imoveis_ativos = self.db.select_object('imoveis', {'status': 'ativo'})
+        imoveis_inativos = self.db.select_object('imoveis', {'status': 'inativo'})
 
         return jsonify({
             'status': 'sucesso',
             'menssagem': 'imoveis encontrados com sucesso',
             'codigo-requisicao': 'in200',
-            'imoveis': imoveis_list
+            'imoveis_ativos': imoveis_ativos,
+            'imoveis_inativos': imoveis_inativos
         })
 
     
@@ -164,6 +149,8 @@ class Imoveis_Models():
 
         if descricao is not None:
             imovel['descricao'] = descricao
+
+        imovel['ultima_atualizacao'] = datetime.now()
 
         self.db.update_object(imovel, 'imoveis', {'_id':  imovel_id})
         imovel = self.db.select_one_object('imovies',  {'_id': imovel_id})
@@ -221,19 +208,52 @@ class Imoveis_Models():
         pass
 
 
-    def imoveis_corretor(self, id):
-        imoveis = self.db.select_object('imoveis', {'corretor_id':  id})
+    def busca_personalizada(self, tipo, categoria, bairro, valor, quartos, imovel_id, corretor_id):
+        query = {'status': 'ativado'}
 
-        if imoveis == None:
+        if tipo is not  None:
+            tipo = tipo.lower()
+            tipos = ['venda', 'aluguel', 'aluguel_temporada']
+
+            if  tipo not in tipos:
+                return jsonify({
+                    'status': 'erro',
+                    'menssagem': 'esse tipo  de imovel não existe',
+                    'codigo-requisicao': 'in404'
+                })
+
+            query['tipo'] = tipo
+
+        if categoria is not None:
+            query['categoria'] = categoria
+
+        if bairro is not None:
+            query['bairro'] = bairro
+
+        if valor is not  None:
+            valor = re.search(r'(?P<min>\d*)-(?P<max>\d*)', valor)
+            min = int(valor.group('min'))
+            max = int(valor.group('max'))
+
+            valores = []
+
+            for x in range(max - min + 1):
+                valores.append(x + min)
+
+            query['valor'] = { "$in" : valores }
+
+        if quartos is not None:
+            query['quartos'] = int(quartos)
+
+        if imovel_id is not  None:
+            query['_id'] = imovel_id
+
+        if corretor_id is not None:
+            query['corretor_id'] = corretor_id
+
+        imoveis =  self.db.select_object('imoveis',  query)
+
+        if imoveis == []:
             raise ImovelNaoEncontrado()
 
-        return jsonify({
-            'status': 'sucesso',
-            'menssagem': 'imoveis encontrados com sucesso',
-            'codigo-requisicao': 'in200',
-            'imovel': imoveis
-        })
-
-
-    def imovel_codigo(self, codigo_imovel):
-        imovel = self.db.select_one_object('imoveis', {'codigo_imovel': codigo_imovel})
+        return  jsonify({'imoveis': imoveis})
