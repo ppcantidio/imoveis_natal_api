@@ -49,6 +49,7 @@ class Validacoes:
         if tamanho_string > valor or string.strip() == '':
             raise CampoIncorreto(campo)
 
+        return string
 
     def int(self, integer, valor, campo):
         try:
@@ -58,6 +59,8 @@ class Validacoes:
 
             if tamanho_integer > valor:
                 raise CampoIncorreto(campo)
+
+            return integer
         except:
             raise CampoIncorreto(campo)
 

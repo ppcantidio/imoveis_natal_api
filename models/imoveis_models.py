@@ -257,3 +257,16 @@ class Imoveis_Models():
             raise ImovelNaoEncontrado()
 
         return  jsonify({'imoveis': imoveis})
+
+    
+    def meus_imoveis(self, corretor_id):
+        imoveis_ativos = self.db.select_object('imoveis', {'corretor_id': corretor_id, 'status': 'ativo'})
+        imoveis_inativos = self.db.select_object('imoveis', {'corretor_id': corretor_id, 'status': 'inativo'})
+
+        return jsonify({
+            'status': 'sucesso',
+            'menssagem': 'imoveis encontrados com sucesso',
+            'codigo-requisicao': 'in200',
+            'imoveis_ativos': imoveis_ativos,
+            'imoveis_inativos': imoveis_inativos
+        })

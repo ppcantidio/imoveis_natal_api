@@ -27,7 +27,7 @@ class Imoveis(MethodView):
             suites=request.form.get('suites'),
             vagas_garagem=request.form.get('vagas_garagem'),
             elevador_servico=request.form.get('elevadores'),
-            piscina_coletiva=request.form.get('piscina_infantil'),
+            piscina_infantil=request.form.get('piscina_infantil'),
             interfone=request.form.get('interfone'),
             quadra_esportes=request.form.get('quadra_esportes'),
             jardim=request.form.get('jardim'),
@@ -37,13 +37,14 @@ class Imoveis(MethodView):
             lavanderia=request.form.get('lavanderia'),
             portaria24h=request.form.get('portaria24h'),
             salao_festas=request.form.get('salao_festas'),
+            banheiros=request.form.get('banheiros'),
             link_youtube=request.form.get('link_youtube')
         )
 
         return imovel
 
 
-    @imoveis_routes.route('exibir/todos', methods=['GET'])
+    @imoveis_routes.route('/todos', methods=['GET'])
     def exibir_todos_imoveis():
 
         return model.exibir_todos_imoveis()
@@ -62,7 +63,7 @@ class Imoveis(MethodView):
 
     @imoveis_routes.route('/excluir', methods=['POST'])
     @login_requiered
-    def excluir_imovel(self):
+    def excluir_imovel():
         imovel = model.excluir_imovel(
             imovel_id=request.form.get('imovel_id'),
             usuario=session['usuario']
@@ -74,7 +75,7 @@ class Imoveis(MethodView):
     @imoveis_routes.route('/meus_imoveis', methods=['GET'])
     @login_requiered
     def meus_imoveis():
-        imoveis = model.busca_personalizada(
+        imoveis = model.meus_imoveis(
             corretor_id=session['usuario']['_id']
         )
 
