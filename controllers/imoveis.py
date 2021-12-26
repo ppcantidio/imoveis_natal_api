@@ -43,7 +43,7 @@ class Imoveis(MethodView):
         return imovel
 
 
-    @imoveis_routes.route('exibit/todos', methods=['GET'])
+    @imoveis_routes.route('exibir/todos', methods=['GET'])
     def exibir_todos_imoveis():
 
         return model.exibir_todos_imoveis()
@@ -83,7 +83,6 @@ class Imoveis(MethodView):
 
     @imoveis_routes.route('/busca', methods=['GET'])
     def exibir_imovel():
-        
         imoveis = model.busca_personalizada(
             tipo=request.args.get('tipo'),
             categoria=request.args.get('categoria'),
