@@ -1,13 +1,10 @@
-from controllers.database.database import Database
+from utils.database.database import Database
 from flask import request, jsonify, Blueprint
 from app import webapi
 from utils.exceptions import UsuarioNaoEncontrado,  PermissaoInvalida, CampoIncorreto, ImovelNaoEncontrado, SenhaIncorreta
-from acessos_token import Token
 from bson.objectid import ObjectId
 
 home_routes = Blueprint('home_routes', __name__)
-
-tk = Token()
 
 @home_routes.route('/', methods=['GET'])
 def home():

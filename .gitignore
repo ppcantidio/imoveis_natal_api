@@ -1,1 +1,27 @@
-venv
+# Specifies intentionally untracked files to ignore when using Git
+# http://git-scm.com/docs/gitignore
+
+*~
+*.sw[mnpcod]
+*.log
+*.tmp
+*.tmp.*
+log.txt
+errors.txt
+
+*.sublime-project
+*.sublime-workspace
+.vscode/
+npm-debug.log*
+
+# Byte-compiled / optimized / DLL files
+*/__pycache__/*
+*/*/__pycache__/*
+utils/requests/__pycache__/*
+__pycache__/*
+*.py[cod]
+
+.idea/*
+.cache*/*
+*.bat
+venv*

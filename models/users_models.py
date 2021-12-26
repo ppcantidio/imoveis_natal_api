@@ -1,11 +1,10 @@
 import uuid
 from flask import session
 from flask.json import jsonify
-from acessos_token import Token
 from bson.objectid import ObjectId
 from passlib.hash import pbkdf2_sha256
 from models.validacoes import Validacoes
-from controllers.database.database import Database
+from utils.database.database import Database
 from utils.exceptions  import UsuarioNaoEncontrado, PermissaoInvalida, SenhaIncorreta
 
 
@@ -13,8 +12,6 @@ class User_Models:
 
     def __init__(self):
         self.db = Database()
-
-        self.token = Token()
 
         self.validacoes = Validacoes()
 

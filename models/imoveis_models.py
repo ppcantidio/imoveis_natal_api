@@ -8,7 +8,7 @@ from pymongo.common import validate
 from utils.exceptions import PermissaoInvalida
 from models.validacoes import Validacoes
 from utils.exceptions import ImovelNaoEncontrado
-from controllers.database.database import Database
+from utils.database.database import Database
 
 class Imoveis_Models():
 
