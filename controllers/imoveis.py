@@ -55,7 +55,30 @@ class Imoveis(MethodView):
     def editar_imovel():
         imovel = model.editar_imovel(
             usuario=session['usuario'],
-            imovel_id=request.form.get('imovel_id')
+            titulo=request.form.get('titulo'),
+            descricao=request.form.get('descricao'),
+            categoria=request.form.get('categoria'),
+            tipo=request.form.get('tipo'),
+            cidade=request.form.get('cidade'),
+            bairro=request.form.get('bairro'),
+            valor=request.form.get('valor'),
+            tamanho=request.form.get('tamanho'),
+            quartos=request.form.get('quartos'),
+            suites=request.form.get('suites'),
+            vagas_garagem=request.form.get('vagas_garagem'),
+            elevador_servico=request.form.get('elevadores'),
+            piscina_infantil=request.form.get('piscina_infantil'),
+            interfone=request.form.get('interfone'),
+            quadra_esportes=request.form.get('quadra_esportes'),
+            jardim=request.form.get('jardim'),
+            playground=request.form.get('playground'),
+            academia=request.form.get('academia'),
+            espaco_gourmet=request.form.get('espaco_gourmet'),
+            lavanderia=request.form.get('lavanderia'),
+            portaria24h=request.form.get('portaria24h'),
+            salao_festas=request.form.get('salao_festas'),
+            banheiros=request.form.get('banheiros'),
+            link_youtube=request.form.get('link_youtube')
         )
 
         return imovel

@@ -44,6 +44,9 @@ class Validacoes:
 
 
     def string(self, string, valor, campo):
+        if string == None:
+            return None
+
         tamanho_string = len(string)
 
         if tamanho_string > valor or string.strip() == '':
@@ -53,6 +56,9 @@ class Validacoes:
 
     def int(self, integer, valor, campo):
         try:
+            if integer == None:
+                return None
+
             tamanho_integer = len(integer)
 
             integer = int(integer)
@@ -67,7 +73,7 @@ class Validacoes:
 
     def booleano(self, booleano):
         if booleano == None:
-            return False
+            return None
 
         booleano = booleano.lower()
         booleano = booleano.capitalize()

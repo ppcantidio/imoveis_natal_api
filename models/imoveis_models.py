@@ -100,7 +100,7 @@ class Imoveis_Models():
     def exibir_todos_imoveis(self):
         imoveis_ativos = self.db.select_object('imoveis', {'status': 'ativo'})
         imoveis_inativos = self.db.select_object('imoveis', {'status': 'inativo'})
-
+        
         return jsonify({
             'status': 'sucesso',
             'menssagem': 'imoveis encontrados com sucesso',
@@ -110,51 +110,122 @@ class Imoveis_Models():
         })
 
     
-    def editar_imovel(self, usuario, imovel_id, categoria, titulo, tamanho, preco, quartos, banheiros, area_lazer, vagas_garagem, elevador, descricao):
-        usuario = self.db.select_one_object('usuarios', {'_id': usuario['_id']})
-
-        imovel = self.db.select_one_object('imoveis', {'_id': imovel_id})
-
-        corretor_id = imovel['corretor_id']
-
-        if corretor_id != usuario['_id']:
+    def editar_imovel(self, imovel_id, usuario, titulo, descricao, categoria, tipo, cidade, bairro, valor, tamanho, quartos,
+     suites, banheiros, vagas_garagem, elevador_servico, piscina_infantil, interfone, quadra_esportes,
+     jardim, playground, academia, espaco_gourmet, lavanderia, portaria24h, salao_festas, link_youtube):
+        imovel = self.db.select_one_object('imovies', {'_id': imovel_id})
+        if usuario['_id'] != imovel['corretor_id']:
             raise PermissaoInvalida()
-        
-        if categoria is not None:
-            imovel['categoria'] = categoria
 
+        tipos = ['apartamento', 'casa', 'casa_comercial', 'casa_condominio', 'cobertura', 'flat', 'ponto_comercial']
+        categorias = ['venda', 'locacao']
+
+        if categoria not in categorias:
+            return jsonify({
+                'status': 'erro',
+                'menssagem': 'categoria invalida',
+                'codigo-requisicao': 'in303'
+            })
+
+        if tipo not in tipos:
+            return jsonify({
+                'status': 'erro',
+                'menssagem': 'tipo invalido',
+                'codigo-requisicao': 'in303'
+            })
+
+        if tipo is not None:
+            imovel['tipo'] = tipo
+
+        if categoria is not None:
+            imovel['categoria'] =  categoria
+
+        if cidade is not None:
+            imovel['cidade'] = cidade
+
+        if bairro is not None:
+            imovel['bairro'] = bairro
+
+        titulo= self.validacoes.string(titulo, 50, 'titulo')
         if titulo is not None:
             imovel['titulo'] = titulo
 
-        if tamanho is not None:
-            imovel['tamanho'] = tamanho
-
-        if preco is not None:
-            imovel['preco'] = preco
-
-        if quartos is not None:
-            imovel['quartos'] =  quartos
-
-        if banheiros is not None:
-            imovel['banheiros'] = banheiros
-
-        if area_lazer is not None:
-            imovel['area_lazer'] = area_lazer
-
-        if vagas_garagem is not None:
-            imovel['vagas_garagem'] = vagas_garagem
-            
-        if elevador is not None:
-            imovel['elevador'] = elevador
-
+        descricao = self.validacoes.string(descricao, 2000, 'descricao')
         if descricao is not None:
             imovel['descricao'] = descricao
 
-        imovel['ultima_atualizacao'] = datetime.now()
+        valor = self.validacoes.int(valor, 9, 'valor')
+        if valor is not None:
+            imovel['valor'] = valor
 
-        self.db.update_object(imovel, 'imoveis', {'_id':  imovel_id})
-        imovel = self.db.select_one_object('imovies',  {'_id': imovel_id})
-        imovel['_id'] = str(imovel['_id'])
+        tamanho = self.validacoes.int(tamanho, 9, 'tamanho')
+        if tamanho is not None:
+            imovel['tamanho'] = tamanho
+
+        quartos = self.validacoes.int(quartos, 2, 'quartos')
+        if quartos  is not None:
+            imovel['quartos'] = quartos
+
+        suites = self.validacoes.int(suites, 2, 'suites')
+        if suites is not None:
+            imovel['suites'] = suites
+
+        banheiros = self.validacoes.int(banheiros, 2, 'banheiuros')
+        if banheiros is not None:
+            imovel['banheiros'] = banheiros
+
+        vagas_garagem = self.validacoes.int(vagas_garagem, 2, 'vagas_garagem')
+        if vagas_garagem is not None:
+            imovel['vagas_garagem'] = vagas_garagem
+        #extras
+        piscina_infantil = self.validacoes.booleano(piscina_infantil)
+        if piscina_infantil is not None:
+            imovel['extras']['piscina_infantil'] = piscina_infantil
+
+        interfone = self.validacoes.booleano(interfone)
+        if interfone is not None:
+            imovel['extras']['interfone'] = None
+
+        quadra_esportes = self.validacoes.booleano(quadra_esportes)
+        if quadra_esportes is not None:
+            imovel['extras']['quadra_esportes'] = quadra_esportes
+
+        jardim = self.validacoes.booleano(jardim)
+        if jardim is not None:
+            imovel['extras']['jardim'] = jardim
+
+        playground = self.validacoes.booleano(playground)
+        if playground is not None:
+            imovel['extras']['playground'] = playground
+
+        academia = self.validacoes.booleano(academia)
+        if academia is not None:
+            imovel['extras']['academia'] = academia
+
+        espaco_gourmet = self.validacoes.booleano(espaco_gourmet)
+        if espaco_gourmet is not None:
+            imovel['extras']['espaco_gourmet'] = espaco_gourmet
+
+        lavanderia = self.validacoes.booleano(lavanderia)
+        if lavanderia is not None:
+            imovel['extras']['lavanderia'] = lavanderia
+
+        portaria24h = self.validacoes.booleano(portaria24h)
+        if portaria24h is not None:
+            imovel['extras']['portaria24h'] = portaria24h
+
+        elevador_servico = self.validacoes.booleano(elevador_servico)
+        if elevador_servico is not None:
+            imovel['extras']['elevador_servico'] = elevador_servico
+
+        salao_festas= self.validacoes.booleano(salao_festas)
+        if salao_festas is not None:
+            imovel['extras']['salao_festas'] = salao_festas
+
+        if link_youtube is not None:
+            imovel['link_youtube'] = link_youtube
+
+        self.db.update_object(imovel, 'imoveis', {'_id': imovel_id})
 
         return jsonify({
             'status': 'sucesso',
