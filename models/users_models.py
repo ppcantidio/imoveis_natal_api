@@ -98,14 +98,17 @@ class User_Models:
         return jsonify({
             'status': 'sucesso',
             'menssagem': 'usuario criado com sucesso',
-            'codigo-requisicao': 'in200',
+            'codigo-requisicao': 'in201',
             'usuario': usuario
-        })
+        }), 201
 
 
     def editar_usuario(self, usuario_requisitor, nome, email, telefone):
         # validacoes dos campos
-        usuario_requisitor = self.db.select_one_object('usuarios', usuario_requisitor['_id'])
+        if usuario_requisitor != session['usuario']['_id']:
+            raise PermissaoInvalida()
+
+        usuario_requisitor = self.db.select_one_object('usuarios', {'_id': usuario_requisitor})
 
         self.validacoes.validar_nome(nome)
         self.validacoes.validar_email(email)
@@ -126,9 +129,9 @@ class User_Models:
         return jsonify({
             'status': 'sucesso',
             "menssagem": 'usuario editado com sucesso',
-            'codigorequisicao': 'in200',
+            'codigorequisicao': 'in202',
             'usuario': usuario
-        })
+        }), 202
 
 
     def editar_permissoes(self, usuario_requisitor, id_requisitado, criar_usuarios,  excluir_usuarios, excluir_imoveis, editar_imoveis, inativar_imoveis, ativar_imoveis, editar_permissoes, inativar_usuarios, ativar_usuarios):
@@ -170,7 +173,7 @@ class User_Models:
             "menssagem": 'permissoes do usuario alteradas com sucesso',
             'codigorequisicao': 'in200',
             'usuario': usuario
-        })
+        }), 200
 
 
     def deletar_usuario(self, id_requisitado, usuario_requisitor):
@@ -201,7 +204,7 @@ class User_Models:
             'status': 'sucesso',
             "menssagem": 'usuario deletado com sucesso',
             'codigorequisicao': 'in200',
-        })
+        }), 200
        
         
     def exbir_usuarios(self):
@@ -219,7 +222,7 @@ class User_Models:
             "menssagem": 'usuarios encontrados com sucesso',
             'codigorequisicao': 'in200',
             'usuario': usuarios
-        })
+        }), 200
 
 
     def inativar_usuario(self, usuario,  id_requisitado):
@@ -257,8 +260,9 @@ class User_Models:
         return jsonify({
             'status': 'sucesso',
             'menssagem': 'usuario inativado com sucesso',
+            'codigo-requisicao': 'in200',
             'usuario': usuario
-        })
+        }), 200
 
 
     def ativar_usuario(self, usuario_requisitor,  id_requisitado):
@@ -295,7 +299,7 @@ class User_Models:
             'status': 'sucesso',
             'menssagem': 'sessão encerrada com sucesso',
             'codigo-requisicao': 'in200'
-            })
+            }), 200
 
 
     def login(self, email, senha):
@@ -312,7 +316,7 @@ class User_Models:
                 'menssagem': 'usuario logado com sucesso',
                 'codigo-requisicao': 'in200',
                 'usuario': usuario
-            })
+            }), 200
 
         raise SenhaIncorreta()
         
@@ -347,3 +351,15 @@ class User_Models:
                 })
         
         raise SenhaIncorreta()
+
+
+    def infos_publicas(self, corretor_id):
+        corretor = self.db.select_one_object('usuarios', {'_id': corretor_id})
+
+        del corretor['senha']
+        del corretor['permissoes']
+        
+        return jsonify({
+            'status': 'sucesso',
+            'corretor': corretor
+        })

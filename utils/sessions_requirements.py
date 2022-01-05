@@ -4,6 +4,7 @@ from functools import wraps
 def login_requiered(f):
     @wraps(f)
     def wrap(*args, **kwargs):
+        print(session)
         if 'logged_in' in session:
             return f(*args, **kwargs)
         else:

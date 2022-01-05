@@ -9,25 +9,32 @@ model = User_Models()
 
 class User(MethodView):
 
-    @users_routes.route('/criar', methods=['POST'])
-    def criar_usuarios():
-        user = model.criar_usuario(
-            #usuario_requisitor=session['usuario'],
-            nome=request.form.get('nome'),
-            senha = request.form.get('senha'),
-            email=request.form.get('email'),
-            telefone=request.form.get('telefone')
-        )
+    @users_routes.route('/', methods=['POST', 'GET'])
+    def usuarios():
+        requisicao = request.method
 
-        return user
+        if requisicao == 'POST':
+            user = model.criar_usuario(
+                #usuario_requisitor=session['usuario'],
+                nome=request.form.get('nome'),
+                senha = request.form.get('senha'),
+                email=request.form.get('email'),
+                telefone=request.form.get('telefone')
+            )
+
+            return user
+
+        elif requisicao == 'GET':
+            return model.exbir_usuarios()
         
 
     # lembrar de editar essa funcao nos models
-    @users_routes.route('/editar', methods=['POST'])
+    # verificar se o usuario que esta solicitando a edicao eh o dono da conta
+    @users_routes.route('/<id>', methods=['PUT'])
     @login_requiered
-    def editar_usuario():       
+    def editar_usuario(id):       
         user = model.editar_usuario(
-            usuario_requisitor=session['usuario'],
+            usuario_requisitor=id,
             nome =request.form.get('nome'),
             email=request.form.get('email'),
             telefone=request.form.get('telefone')
@@ -36,18 +43,18 @@ class User(MethodView):
         return user
 
 
-    @users_routes.route('/deletar', methods=['POST'])
+    @users_routes.route('/<id>', methods=['DELETE'])
     @login_requiered
-    def deletar_usuario():
+    def deletar_usuario(id):
         resultado = model.deletar_usuario(
             usuario_requisitor=session['usuario'],
-            id_requisitado=request.form.get('id_requisitado')
+            id_requisitado=id
         )
 
         return resultado
 
 
-    @users_routes.route('/inativar', methods=['POST'])
+    @users_routes.route('/inativar', methods=['PUT'])
     @login_requiered
     def inativar_usuario():
 
@@ -59,7 +66,7 @@ class User(MethodView):
         return usuario
 
     
-    @users_routes.route('/ativar', methods=['POST'])
+    @users_routes.route('/ativar', methods=['PUT'])
     @login_requiered
     def ativar_usuario():
         usuario = model.ativar_usuario(
@@ -70,7 +77,7 @@ class User(MethodView):
         return usuario
 
 
-    @users_routes.route('/permissoes', methods=['POST'])
+    @users_routes.route('/permissoes/', methods=['PUT'])
     @login_requiered
     def editar_permissoes():
         user = model.editar_permissoes(
@@ -88,12 +95,6 @@ class User(MethodView):
         )
 
         return user
-
-    @users_routes.route('/todos', methods=['GET'])
-    @login_requiered
-    def  exibir_usuarios():
-
-        return model.exbir_usuarios()
 
     
     @users_routes.route('/sair', methods=['GET'])
@@ -118,6 +119,7 @@ class User(MethodView):
     @users_routes.route('/perfil', methods=['GET'])
     @login_requiered
     def exibir_perfil():
+        print(session)
         usuario = model.exibir_usuario(
             usuario_id=session['usuario']['_id']
         )
@@ -125,7 +127,7 @@ class User(MethodView):
         return usuario
 
     
-    @users_routes.route('/trocar_senha', methods=['POST'])
+    @users_routes.route('/trocar_senha', methods=['PUT'])
     @login_requiered
     def trocar_senha():
         usuario = model.trocar_senha(
@@ -137,3 +139,9 @@ class User(MethodView):
 
         return usuario
         
+
+    @users_routes.route('/info/<id>')
+    def infos_publicas(id):
+        usuario = model.infos_publicas(corretor_id=id)
+
+        return usuario

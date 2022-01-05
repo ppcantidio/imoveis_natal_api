@@ -280,23 +280,24 @@ class Imoveis_Models():
 
 
     def busca_personalizada(self, tipo, categoria, bairro, valor, quartos, imovel_id, corretor_id):
-        query = {'status': 'ativado'}
+        query = {'status': 'ativo'}
 
-        if tipo is not  None:
-            tipo = tipo.lower()
-            tipos = ['venda', 'aluguel', 'aluguel_temporada']
+        print(categoria)
+        if categoria is not  None:
+            categoria = categoria.lower()
+            categorias = ['venda', 'aluguel', 'aluguel_temporada']
 
-            if  tipo not in tipos:
+            if  categoria not in categorias:
                 return jsonify({
                     'status': 'erro',
                     'menssagem': 'esse tipo  de imovel não existe',
                     'codigo-requisicao': 'in404'
                 })
 
-            query['tipo'] = tipo
-
-        if categoria is not None:
             query['categoria'] = categoria
+
+        if tipo is not None:
+            query['tipo'] = tipo
 
         if bairro is not None:
             query['bairro'] = bairro
@@ -322,12 +323,17 @@ class Imoveis_Models():
         if corretor_id is not None:
             query['corretor_id'] = corretor_id
 
+        print(query)
         imoveis =  self.db.select_object('imoveis',  query)
 
         if imoveis == []:
             raise ImovelNaoEncontrado()
 
-        return  jsonify({'imoveis': imoveis})
+        return  jsonify({
+            'codigo-requisicao': 'in200',
+            'menssagem': 'imoveis encontrados com sucesso',
+            'imoveis': imoveis
+            })
 
     
     def meus_imoveis(self, corretor_id):

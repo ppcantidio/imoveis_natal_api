@@ -10,50 +10,53 @@ model = Imoveis_Models()
 class Imoveis(MethodView):
 
 
-    @imoveis_routes.route('/criar', methods=['POST'])
+    @imoveis_routes.route('/', methods=['POST', 'GET'])
+    def imovel():
+
+        requisicao = request.method
+
+        print(requisicao)
+
+        if requisicao == 'POST':
+            imovel = model.criar_imovel(
+                usuario=session['usuario'],
+                titulo=request.form.get('titulo'),
+                descricao=request.form.get('descricao'),
+                categoria=request.form.get('categoria'),
+                tipo=request.form.get('tipo'),
+                cidade=request.form.get('cidade'),
+                bairro=request.form.get('bairro'),
+                valor=request.form.get('valor'),
+                tamanho=request.form.get('tamanho'),
+                quartos=request.form.get('quartos'),
+                suites=request.form.get('suites'),
+                vagas_garagem=request.form.get('vagas_garagem'),
+                elevador_servico=request.form.get('elevadores'),
+                piscina_infantil=request.form.get('piscina_infantil'),
+                interfone=request.form.get('interfone'),
+                quadra_esportes=request.form.get('quadra_esportes'),
+                jardim=request.form.get('jardim'),
+                playground=request.form.get('playground'),
+                academia=request.form.get('academia'),
+                espaco_gourmet=request.form.get('espaco_gourmet'),
+                lavanderia=request.form.get('lavanderia'),
+                portaria24h=request.form.get('portaria24h'),
+                salao_festas=request.form.get('salao_festas'),
+                banheiros=request.form.get('banheiros'),
+                link_youtube=request.form.get('link_youtube')
+            )
+
+            return imovel
+
+        elif requisicao == 'GET':
+            return model.exibir_todos_imoveis()
+
+
+    @imoveis_routes.route('/<id>', methods=['PUT'])
     @login_requiered
-    def criar_imovel():
-        imovel = model.criar_imovel(
-            usuario=session['usuario'],
-            titulo=request.form.get('titulo'),
-            descricao=request.form.get('descricao'),
-            categoria=request.form.get('categoria'),
-            tipo=request.form.get('tipo'),
-            cidade=request.form.get('cidade'),
-            bairro=request.form.get('bairro'),
-            valor=request.form.get('valor'),
-            tamanho=request.form.get('tamanho'),
-            quartos=request.form.get('quartos'),
-            suites=request.form.get('suites'),
-            vagas_garagem=request.form.get('vagas_garagem'),
-            elevador_servico=request.form.get('elevadores'),
-            piscina_infantil=request.form.get('piscina_infantil'),
-            interfone=request.form.get('interfone'),
-            quadra_esportes=request.form.get('quadra_esportes'),
-            jardim=request.form.get('jardim'),
-            playground=request.form.get('playground'),
-            academia=request.form.get('academia'),
-            espaco_gourmet=request.form.get('espaco_gourmet'),
-            lavanderia=request.form.get('lavanderia'),
-            portaria24h=request.form.get('portaria24h'),
-            salao_festas=request.form.get('salao_festas'),
-            banheiros=request.form.get('banheiros'),
-            link_youtube=request.form.get('link_youtube')
-        )
-
-        return imovel
-
-
-    @imoveis_routes.route('/todos', methods=['GET'])
-    def exibir_todos_imoveis():
-
-        return model.exibir_todos_imoveis()
-
-
-    @imoveis_routes.route('/editar', methods=['POST'])
-    @login_requiered
-    def editar_imovel():
+    def editar_imovel(id):
         imovel = model.editar_imovel(
+            imovel_id=id,
             usuario=session['usuario'],
             titulo=request.form.get('titulo'),
             descricao=request.form.get('descricao'),
@@ -84,11 +87,11 @@ class Imoveis(MethodView):
         return imovel
 
 
-    @imoveis_routes.route('/excluir', methods=['POST'])
+    @imoveis_routes.route('/<id>', methods=['DELETE'])
     @login_requiered
-    def excluir_imovel():
+    def excluir_imovel(id):
         imovel = model.excluir_imovel(
-            imovel_id=request.form.get('imovel_id'),
+            imovel_id=id,
             usuario=session['usuario']
         )
 
@@ -106,7 +109,8 @@ class Imoveis(MethodView):
 
 
     @imoveis_routes.route('/busca', methods=['GET'])
-    def exibir_imovel():
+    def busca():
+        print('teste')
         imoveis = model.busca_personalizada(
             tipo=request.args.get('tipo'),
             categoria=request.args.get('categoria'),

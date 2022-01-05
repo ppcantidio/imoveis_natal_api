@@ -4,7 +4,9 @@ from app import webapi
 from utils.exceptions import UsuarioNaoEncontrado,  PermissaoInvalida, CampoIncorreto, ImovelNaoEncontrado, SenhaIncorreta
 from bson.objectid import ObjectId
 
+
 home_routes = Blueprint('home_routes', __name__)
+
 
 @home_routes.route('/', methods=['GET'])
 def home():
@@ -53,6 +55,12 @@ def home():
 #                 "codigo_requisicao": "in02"
 #             }), 403
 
+@home_routes.after_request # blueprint can also be app~~
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    return response
+
 
 @webapi.errorhandler(404)
 def page_not_found(e):
@@ -68,8 +76,8 @@ def usuario_nao_encontrado(UsuarioNaoEncontradoObject):
     return jsonify({
                 'status': 'erro',
                 'menssagem': 'usuario não  encontrado no sistema',
-                'codigo-requisicao':  'in404'
-            })
+                'codigo-requisicao':  'in204'
+            }), 204
 
 
 @webapi.errorhandler(PermissaoInvalida)
@@ -86,8 +94,8 @@ def campo_incorreto(CampoIncorretoObject):
     return jsonify({
                 'status': 'erro',
                 'menssagem': f'o campo {CampoIncorretoObject.campo} não foi preenchido corretamente',
-                'codigo-requisicao': 'in10'
-    })
+                'codigo-requisicao': 'in400'
+    }), 400
 
 
 @webapi.errorhandler(ImovelNaoEncontrado)
@@ -95,14 +103,14 @@ def imovel_nao_encontrado(ImovelNaoEncontradoObject):
     return jsonify({
                 'status': 'erro',
                 'menssagem': 'imovel não encontrado no sistema',
-                'codigo-requisicao': 'in404'
-    })
+                'codigo-requisicao': 'in204'
+    }), 204
 
 
 @webapi.errorhandler(SenhaIncorreta)
-def imovel_nao_encontrado(SenhaIncorretaObject):
+def senha_incorreta(SenhaIncorretaObject):
     return jsonify({
                 'status': 'erro',
                 'menssagem': 'senha incorreta',
-                'codigo-requisicao': 'in404'
-    })
+                'codigo-requisicao': 'in422'
+    }), 422

@@ -1,8 +1,10 @@
 from flask import Flask
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 load_dotenv('.env')
 webapi = Flask(__name__)
+CORS(webapi)
 webapi.secret_key = 'enhasupersecreta'
 
 #importando blueprints
