@@ -52,6 +52,8 @@ class Imoveis_Models():
                 'codigo-requisicao': 'in303'
             })
 
+        
+
         imovel = {
             '_id': codigo_imovel,
             'corretor_id': corretor['_id'],
@@ -80,7 +82,7 @@ class Imoveis_Models():
                 'elevador_servico': self.validacoes.booleano(elevador_servico),
                 'sala_festas': self.validacoes.booleano(salao_festas)
             },
-            'imagens': {},
+            'imagens': [],
             'link_youtube': link_youtube,
             'data_criacao': datetime.now(),
             'ultima_atualizacao':  datetime.now(),
