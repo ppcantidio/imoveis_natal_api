@@ -8,9 +8,6 @@ class CorretorSchema(Schema):
     nmTelefone = fields.String(required=True)
     tpTipo = fields.String(required=True)
     tpStatus = fields.String(required=True)
-    permissoes = 
-
-
 
 
 
