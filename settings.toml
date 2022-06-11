@@ -1,0 +1,16 @@
+[default]
+DEBUG = false
+EXTENSIONS = [
+    "api.extensions.restful:init_app",
+]
+
+
+[development]
+EXTENSIONS = [
+    "dynaconf_merge_unique"  # to reuse extensions list from [default]
+]
+DEBUG = true
+
+
+[production]
+DEBUG = false

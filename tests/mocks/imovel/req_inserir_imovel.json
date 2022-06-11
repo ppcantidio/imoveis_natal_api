@@ -1,0 +1,36 @@
+{
+    "obImovel": {
+        "nmTitulo": "Apartamento na beira do mar em Natal",
+        "nmDescricao": "Apartamento super bem localizado de unico dono condomino otimo para criancas.",
+        "cdTipoImovel": "1",
+        "cdCategoriaImovel": "1",
+        "mpEndereco": {
+            "nmBairro": "",
+            "nmCep": "",
+            "nmComplemento": "",
+            "nmLogradouro": "",
+            "nmNumero": "",
+            "nmPais": "",
+            "nmUf": ""
+        },
+        "qtdQuartos": 3,
+        "qtdSuites": 1,
+        "qtdBanheiros": 2,
+        "qtdVagasGaragem": 2,
+        "vlValorImovel": 100000,
+        "mpExtras": {
+            "inPiscinaInfantil": true,
+            "inInterfone": true,
+            "inQuadraEsportes": true,
+            "inAcademia": true,
+            "inEspacoGourmet": true,
+            "inPortaria24h": true,
+            "inElevadorServico": true,
+            "inElevadorSocial": true,
+            "inSalaoFestas": true
+        },
+        "lsImagens": [],
+        "nmVideoYoutube": "",
+        "tpStatus": "1"
+    }
+}
