@@ -6,6 +6,8 @@ EXTENSIONS = [
 
 
 [development]
+LOCAL_CONNCTION = "localhost:27017"
+DB_NAME = "imoveis_natal"
 EXTENSIONS = [
     "dynaconf_merge_unique"  # to reuse extensions list from [default]
 ]

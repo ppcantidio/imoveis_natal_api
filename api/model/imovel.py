@@ -1,3 +1,4 @@
+from email.policy import default
 from marshmallow import Schema, validate
 from marshmallow.fields import Str, Integer, Boolean, Nested, List
 
@@ -7,15 +8,15 @@ from api.utils.messages import MSG_FIELD_REQUIRED
 
 
 class Extras(Schema):
-    inPiscinaInfantil = Boolean()
-    inInterfone = Boolean()
-    inQuadraEsportes = Boolean()
-    inAcademia = Boolean()
-    inEspacoGourmet = Boolean()
-    inPortaria24h = Boolean()
-    inElevadorServico = Boolean()
-    inElevadorSocial = Boolean()
-    inSalaoFestas = Boolean()
+    inPiscinaInfantil = Boolean(required=False, default=None)
+    inInterfone = Boolean(required=False, default=None)
+    inQuadraEsportes = Boolean(required=False, default=None)
+    inAcademia = Boolean(required=False, default=None)
+    inEspacoGourmet = Boolean(required=False, default=None)
+    inPortaria24h = Boolean(required=False, default=None)
+    inElevadorServico = Boolean(required=False, default=None)
+    inElevadorSocial = Boolean(required=False, default=None)
+    inSalaoFestas = Boolean(required=False, default=None)
 
 
 class ImovelRequestPost(Schema):
@@ -30,6 +31,6 @@ class ImovelRequestPost(Schema):
     qtdVagasGaragem = Integer(required=True, error_messages={'required': MSG_FIELD_REQUIRED})
     vlValorImovel = Integer(required=True, error_messages={'required': MSG_FIELD_REQUIRED})
     obExtras = List(Nested(Extras), required=True, error_messages={'required': MSG_FIELD_REQUIRED})
-    lsImagens = List()
-    nmVideoYoutube = Str()
-    nmStatus = Str()
+    lsImagens = List(required=True, default=None)
+    nmVideoYoutube = Str(required=False, default=None)
+    nmStatus = Str(required=False, default=None)
