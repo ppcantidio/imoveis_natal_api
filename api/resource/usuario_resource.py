@@ -1,5 +1,5 @@
 from flask import request
-from flask_restplus import Resource
+from flask_restx import Resource
 
 from api.model.usuario import UsuarioRequestPost
 from api.service.usuario_service import UsuarioService
@@ -12,9 +12,9 @@ class UsuarioResource(Resource):
         """
        Registra usuario na base de dados
        """
-        req_data = request.json_get()
+        req_data = request.get_json() or {}
 
-        usuario_request, erros = UsuarioRequestPost.load(req_data)
+        usuario_request, erros = UsuarioRequestPost().load(req_data)
         if erros:
             return resp_data_invalid('Usuario', erros, 'Dados de entrada inválidos.')
 

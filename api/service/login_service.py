@@ -1,4 +1,4 @@
-import jwt
+import python_jwt as jwt
 from datetime import datetime
 from dynaconf import settings
 

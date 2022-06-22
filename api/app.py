@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_restplus import Api
+from flask_restx import Api
 
 
 # Importando resources
@@ -11,9 +11,9 @@ from api.resource.login_resource import LoginResource
 def config_routes(app):
     api = Api(app)
 
-    api.register_resource(UsuarioResource, '/api/v1/usuario')
-    api.register_resource(ImovelResource, '/api/v1/imovel')
-    api.register_resource(LoginResource, '/api/v1/login')
+    api.add_resource(UsuarioResource, '/api/v1/usuario')
+    api.add_resource(ImovelResource, '/api/v1/imovel')
+    api.add_resource(LoginResource, '/api/v1/login')
 
 
 def create_app():

@@ -1,5 +1,5 @@
 from flask import request
-from flask_restplus import Resource
+from flask_restx import Resource
 
 from api.service.login_service import LoginService
 from api.model.login import LoginRequestPost

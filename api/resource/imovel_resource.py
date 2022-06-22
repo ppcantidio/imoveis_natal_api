@@ -1,4 +1,4 @@
-from flask_restplus import Resource
+from flask_restx import Resource
 from flask import request
 
 from api.model.imovel import ImovelRequestPost
@@ -13,7 +13,7 @@ class ImovelResource(Resource):
         Insere imovel na base de dados
         """
 
-        req_data = request.get_json() or None
+        req_data = request.get_json() or {}
 
         imovel_request, erros = ImovelRequestPost().load(req_data)
         if erros:

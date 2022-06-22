@@ -1,2 +1,33 @@
-# default-flask-architecture
-My default Flask architecture for APIs
+# Imoveis Natal API
+
+Essa é uma API desenvolvida para o sistema Imoveis Natal.
+
+Imoveis Natal é um sistema para anuncio de imoveis com foco para corretores que trabalham na região metropolitana de Natal RN, o sistema tem como principais funcionaliades as opções de CRUD de imoveis e gerenciamento de anuncios.
+
+
+## Sobre a tecnologia
+
+Para criação dessa API utilizei do micro-framework Flask e sua extensão flask-restx para gerenciamento de rotas e organização da documentão gerada automaticamente em swagger, porém também irei disponibilizar um link para download de uma collection no postman.
+
+Como banco de dados resolvi utilizar o MongoDB, um banco de dados não relacional.
+
+
+## How to run
+
+Para rodar a aplicação é bem simples, é necessário tem o **Python 3** e o **MongoDB Server** instalado na sua máquina e seguinte os seguintes passos:
+
+1 - Cria um ambiente virtual(venv) para instalar as dependencias do projeto:
+
+`python3 -m venv venv`
+
+2 - Ative o ambiente virtual:
+
+`venv\Scripts\activate`
+
+3 - Instale as dependências:
+
+`pip install -r requirements.txt`
+
+4 - Agora é só rodar a aplicação:
+
+`flask run`

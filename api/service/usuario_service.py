@@ -5,7 +5,8 @@ from api.mapper.usuario_mapper import UsuarioMapper
 
 class UsuarioService:
     def registra_usuario(self, usuario_request: dict):
-        usuario_object = UsuarioMapper().registrar_usuario_mapper(usuario_request)
+        # usuario_object = UsuarioMapper().registrar_usuario_mapper(usuario_request)
+        usuario_object = usuario_request
         if DB().select_one_object('usuarios', {'nmApelido': usuario_object.get('nmApelido')}) is not None:
             raise CommonError(2)
 

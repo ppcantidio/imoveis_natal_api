@@ -31,6 +31,6 @@ class ImovelRequestPost(Schema):
     qtdVagasGaragem = Integer(required=True, error_messages={'required': MSG_FIELD_REQUIRED})
     vlValorImovel = Integer(required=True, error_messages={'required': MSG_FIELD_REQUIRED})
     obExtras = List(Nested(Extras), required=True, error_messages={'required': MSG_FIELD_REQUIRED})
-    lsImagens = List(required=True, default=None)
+    # lsImagens = List(required=True, default=None)
     nmVideoYoutube = Str(required=False, default=None)
     nmStatus = Str(required=False, default=None)

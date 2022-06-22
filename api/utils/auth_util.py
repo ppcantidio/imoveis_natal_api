@@ -1,5 +1,5 @@
 import json
-import jwt
+import python_jwt as jwt
 from datetime import datetime, timedelta
 from flask import request, jsonify
 from api.utils.exceptions import CommonError
