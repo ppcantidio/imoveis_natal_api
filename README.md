@@ -1,8 +1,8 @@
-# Imoveis Natal API
+# Imóveis Natal API
 
-Essa é uma API desenvolvida para o sistema Imoveis Natal.
+Essa é uma API desenvolvida para o sistema Imóveis Natal.
 
-Imoveis Natal é um sistema para anuncio de imoveis com foco para corretores que trabalham na região metropolitana de Natal RN, o sistema tem como principais funcionaliades as opções de CRUD de imoveis e gerenciamento de anuncios.
+Imóveis Natal é um sistema para anuncio de imóveis com foco para corretores que trabalham na região metropolitana de Natal RN, o sistema tem como principais funcionalidades as opções de CRUD de imóveis e gerenciamento de anúncios.
 
 
 ## Sobre a tecnologia
@@ -16,7 +16,7 @@ Como banco de dados resolvi utilizar o MongoDB, um banco de dados não relaciona
 
 Para rodar a aplicação é bem simples, é necessário tem o **Python 3** e o **MongoDB Server** instalado na sua máquina e seguinte os seguintes passos:
 
-1 - Cria um ambiente virtual(venv) para instalar as dependencias do projeto:
+1 - Cria um ambiente virtual(venv) para instalar as dependências do projeto:
 
 `python3 -m venv venv`
 
