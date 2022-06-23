@@ -5,5 +5,5 @@ from api.utils.messages import MSG_FIELD_REQUIRED
 
 
 class LoginRequestPost(Schema):
-    username = Str(required=True, error_messages={'required': MSG_FIELD_REQUIRED})
-    passowrd = Str(required=True, error_messages={'required': MSG_FIELD_REQUIRED})
+    nmUsername = Str(required=True, error_messages={'required': MSG_FIELD_REQUIRED})
+    nmPassword = Str(required=True, error_messages={'required': MSG_FIELD_REQUIRED})

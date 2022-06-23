@@ -6,6 +6,7 @@ from flask_restx import Api
 from api.resource.usuario_resource import UsuarioResource
 from api.resource.imovel_resource import ImovelResource
 from api.resource.login_resource import LoginResource
+from api.resource.erros_resource import errors_routes
 
 
 def config_routes(app):
@@ -18,6 +19,7 @@ def config_routes(app):
 
 def create_app():
     app = Flask(__name__)
+    app.register_blueprint(errors_routes)
     config_routes(app)
     
     return app

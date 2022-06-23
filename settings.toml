@@ -1,5 +1,6 @@
 [default]
 DEBUG = false
+SECRET_KEY = "f3cfe9ed8fae309f02079dbf"
 EXTENSIONS = [
     "api.extensions.restful:init_app",
 ]

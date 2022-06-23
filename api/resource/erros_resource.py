@@ -5,18 +5,18 @@ errors_routes = Blueprint('errors_routes', __name__)
 
 
 @errors_routes.app_errorhandler(CommonError)
-def handle_validation_error(error):
+def handle_validation_error(CommonErrorObject):
     dict_errors = {
-        '01': 'Erro generico',
-        '02': 'Erro generico',
-        '03': 'Erro generico',
-        '04': 'Erro generico',
-        '05': 'Erro generico',
-        '06': 'Erro generico',
-        '07': 'Erro generico'
+        '1': 'Erro generico',
+        '2': 'Erro generico',
+        '3': 'Erro generico',
+        '4': 'Erro generico',
+        '5': 'Erro generico',
+        '6': 'Erro generico',
+        '7': 'Erro generico'
     }
 
-    return {
-               "status": "error",
-               "message": dict_errors.get(error.code_error)
-           }, 422
+    return jsonify({
+               "status": "erro",
+               "menssagem": dict_errors.get(str(CommonErrorObject.code_error))
+           })

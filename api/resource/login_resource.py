@@ -7,12 +7,12 @@ from api.utils.responses import (resp_data_invalid, resp_ok)
 
 
 class LoginResource(Resource):
-    def post():
+    def post(self):
         """
         Autentica o usuario
         """
 
-        req_data = request.get_json() or None
+        req_data = request.get_json() or {}
 
         login_request, erros = LoginRequestPost().load(req_data)
         if erros:
